@@ -26,7 +26,7 @@ window.ZDATA = {};
   if (!UNIVERS[P.univers]) P.univers = 'trottinette';
   const fille = /^f/i.test((P.enfant && P.enfant.genre) || '');
   const accueil = P.animaux.find(a => (a.roles || []).includes('accueil')) || P.animaux[0];
-  const NOMS = { chat: ['chat', 'chats'], chien: ['chien', 'chiens'], lapin: ['lapin', 'lapins'], cheval: ['cheval', 'chevaux'], tortue: ['tortue', 'tortues'], oiseau: ['oiseau', 'oiseaux'] };
+  const NOMS = { chat: ['chat', 'chats'], chien: ['chien', 'chiens'], lapin: ['lapin', 'lapins'], cheval: ['cheval', 'chevaux'], tortue: ['tortue', 'tortues'], oiseau: ['oiseau', 'oiseaux'], humain: ['ami', 'amis'] };
   const esp = NOMS[accueil.espece] || NOMS.chat;
   const cap = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
 
@@ -175,6 +175,10 @@ ZDATA.words = [
   { th: 'tortue', id: 'carapace', s: 'ca-ra-pa-[c]e', e: '🛡️', ph: "La tortue rentre dans sa carapace.", hint: "Carapace finit par C E : le C fait s." },
   { th: 'oiseau', id: 'oiseau', s: '[oi]-s[eau]', e: '🐦', ph: "Un oiseau chante sur la branche.", hint: "Oiseau : O I, puis le S entre deux voyelles fait z, et E A U à la fin." },
   { th: 'oiseau', id: 'plume', s: 'plu-m(e)', e: '🪶', ph: "Une plume tombe doucement.", hint: "Plume finit par un E muet." },
+  { th: 'moto', id: 'moteur', s: 'mo-teur', e: '🏍️', ph: "Le moteur de la moto ronronne.", hint: "Moteur finit par E U R, sans E à la fin." },
+  { th: 'moto', id: 'virage', s: 'vi-ra-g(e)', e: '↪️', ph: "Je ralentis avant le virage.", hint: "Virage finit par G E : le G fait j." },
+  { th: 'moto', id: 'casque', s: 'cas-[qu]e', e: '⛑️', ph: "Je mets mon casque avant de démarrer.", hint: "Casque : le son k s'écrit Q U." },
+  { th: 'moto', id: 'carburant', s: 'car-bu-r[an](t)', e: '⛽', ph: "Je fais le plein de carburant.", hint: "Carburant : A N, et un T muet." },
   { th: 'trail', id: 'sentier', s: '[s][en]-ti[er]', e: '🥾', ph: "Le sentier monte dans la forêt.", hint: "Sentier : E N, puis I E R à la fin, comme dans premier." },
   { th: 'trail', id: 'montee', s: 'm[on]-t[ée]', e: '⛰️', ph: "La montée est longue, mais j'avance.", hint: "Montée : O N, puis É E à la fin." },
   { th: 'trail', id: 'souffle', s: 'sou-[ff]l(e)', e: '💨', ph: "Je reprends mon souffle en haut de la côte.", hint: "Souffle a deux F." },
@@ -217,6 +221,16 @@ ZDATA.problems = [
     q: ["Combien de plots dans chaque rangée ?", "Combien de rangées ?", "De quelle couleur sont les plots ?"],
     op: '÷', a: 36, b: 4, r: 9, unit: 'plots',
     end: ["Il y a 9 plots dans chaque rangée.", "Il y a 9 entraîneurs dans chaque rangée."] },
+  { th: 'moto', id: 'mo1', e: '🏍️', schema: 'parties', unknown: 'partie',
+    text: "La balade à moto fait {180} kilomètres. @enfant a déjà roulé {115} kilomètres. Sa moto est {rouge!}. Combien de kilomètres reste-t-il ?",
+    q: ["Combien de kilomètres reste-t-il ?", "De quelle couleur est la moto ?", "Combien de kilomètres en tout ?"],
+    op: '-', a: 180, b: 115, r: 65, unit: 'km',
+    end: ["Il reste 65 kilomètres à rouler.", "Il reste 65 motos."] },
+  { th: 'moto', id: 'mo2', e: '⛽', schema: 'groupes', unknown: 'tout',
+    text: "Le réservoir de la moto contient {15} litres. @enfant fait le plein {4} fois ce mois-ci. La station ouvre à {8!} heures. Combien de litres a-t-@il mis en tout ?",
+    q: ["Combien de litres en tout ?", "À quelle heure ouvre la station ?", "Combien de pleins ?"],
+    op: '×', a: 4, b: 15, r: 60, unit: 'litres',
+    end: ["@enfant a mis 60 litres en tout.", "@enfant a fait 60 pleins."] },
   { th: 'trail', id: 'tr1', e: '⛰️', schema: 'parties', unknown: 'partie',
     text: "Le trail fait {32} kilomètres. @enfant a déjà couru {19} kilomètres. Il fait {12!} degrés. Combien de kilomètres reste-t-il à courir ?",
     q: ["Combien de kilomètres reste-t-il ?", "Quelle température fait-il ?", "Combien de kilomètres en tout ?"],
@@ -360,7 +374,7 @@ ZDATA.stickers = [
   { id: 'l2', e: '🌟', n: 'Super étoile', r: 3 }, { id: 'l3', e: '🦄', n: 'Licorne turbo', r: 3 }
 ].concat(
   ...[...new Set([PROFIL.univers, ...PROFIL.passions])].map(u => (UNIVERS[u] && UNIVERS[u].autocollants) || []),
-  [...new Set(PROFIL.animaux.map(a => a.espece))].map(e => ({ id: 'a_' + e, e: { chat: '🐱', chien: '🐶', lapin: '🐰', cheval: '🐴', tortue: '🐢', oiseau: '🐦' }[e] || '🐾', n: { chat: 'Chat', chien: 'Chien', lapin: 'Lapin', cheval: 'Cheval', tortue: 'Tortue', oiseau: 'Oiseau' }[e] || 'Animal', r: 1 })));
+  [...new Set(PROFIL.animaux.map(a => a.espece))].map(e => ({ id: 'a_' + e, e: { chat: '🐱', chien: '🐶', lapin: '🐰', cheval: '🐴', tortue: '🐢', oiseau: '🐦', humain: '🙂' }[e] || '🐾', n: { chat: 'Chat', chien: 'Chien', lapin: 'Lapin', cheval: 'Cheval', tortue: 'Tortue', oiseau: 'Oiseau', humain: 'Ami' }[e] || 'Animal', r: 1 })));
 
 /* Phrases d'encouragement : on félicite l'EFFORT et la MÉTHODE, pas le "don". */
 ZDATA.praise = [

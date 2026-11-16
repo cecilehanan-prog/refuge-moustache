@@ -17,7 +17,7 @@
    puis les données propres au moteur (voir les exemples ci-dessous).
 
    Adeline : adulte, niveau lycée, dyspraxique.
-   Rubriques : français, maths, histoire. Univers : le trail.
+   Rubriques : français, maths, histoire. Univers : la moto (le trail en bonus dans les calculs).
    ========================================================= */
 window.ZCONTENU = {
 
@@ -45,7 +45,7 @@ window.ZCONTENU = {
       ] },
     { id: 'champ-lexical', type: 'paires', titre: 'Les champs lexicaux', notion: 'Vocabulaire',
       consigne: 'Relie chaque mot au champ lexical auquel il appartient.',
-      paires: [['Dénivelé', 'Le trail'], ['Ronronner', 'Le chat'], ['Plumage', 'L\'oiseau'], ['Houblon', 'La brasserie'], ['Verger', 'La pomme']] },
+      paires: [['Embrayage', 'La moto'], ['Dénivelé', 'Le trail'], ['Ronronner', 'Le chat'], ['Plumage', 'L\'oiseau'], ['Houblon', 'La brasserie'], ['Verger', 'La pomme']] },
     { id: 'homophones', type: 'trous', titre: 'Les homophones', notion: 'Orthographe',
       rappel: 'a / à : remplace par « avait ». Si ça marche, c\'est « a ». ou / où : « où » indique le lieu ou le moment. ces / ses : « ses » = les siens, « ces » = ceux-là.',
       phrases: [
@@ -70,6 +70,7 @@ window.ZCONTENU = {
       rappel: 'Vitesse moyenne = distance ÷ temps. Pour prendre un pourcentage, on divise par 100 puis on multiplie.',
       questions: [
         { q: 'Un trail de 24 km parcouru en 3 heures. Quelle est la vitesse moyenne ?', reponse: 8, unite: 'km/h', aide: 'Distance ÷ temps : 24 ÷ 3.', solution: '24 ÷ 3 = 8 km/h.' },
+        { q: 'À moto, Adeline roule 135 km en 1 h 30. Quelle est sa vitesse moyenne ?', reponse: 90, unite: 'km/h', aide: '1 h 30, c\'est 1,5 heure. Fais 135 ÷ 1,5.', solution: '135 ÷ 1,5 = 90 km/h.' },
         { q: 'Départ à 650 m d\'altitude, sommet à 1 420 m. Quel est le dénivelé positif ?', reponse: 770, unite: 'm', aide: 'Altitude d\'arrivée moins altitude de départ.', solution: '1 420 - 650 = 770 m.' },
         { q: 'Une bière de 33 cl titre 5 % d\'alcool. Combien de centilitres d\'alcool pur contient-elle ?', reponse: 1.65, tolerance: 0.01, unite: 'cl', aide: '1 % de 33, c\'est 0,33. Multiplie par 5.', solution: '33 × 5 ÷ 100 = 1,65 cl.' },
         { q: 'Une pomme fait 150 g. Adeline en mange 4 par jour pendant une semaine (et met des miettes partout). Combien de kilos de pommes ?', reponse: 4.2, tolerance: 0.01, unite: 'kg', aide: '150 × 4 × 7 grammes, puis divise par 1 000.', solution: '150 × 4 × 7 = 4 200 g = 4,2 kg.' },

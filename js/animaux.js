@@ -2,12 +2,13 @@
    LES ANIMAUX GUIDES : dessinés en code (SVG), sans photo
    ---------------------------------------------------------
    Z.art.animal({ espece, couleurs, acc, mood })
-   espece : 'chat' | 'chien' | 'lapin' | 'cheval' | 'tortue' | 'oiseau'
+   espece : 'chat' | 'chien' | 'lapin' | 'cheval' | 'tortue' | 'oiseau' | 'humain'
    couleurs (toutes facultatives) :
      pelage   = couleur principale        clair  = ventre, museau
      oreilles = intérieur ou oreilles     taches = rayures / taches
      yeux     = couleur des yeux          collier = couleur du collier
-     (tortue : carapace, bord · oiseau : ailes, bec)
+     (tortue : carapace, bord · oiseau : ailes, bec ·
+     humain : peau, cheveux, coupe 'courts'|'longs', yeux, tshirt, motif, barbe)
    La tête est toujours centrée en (60, 52) : les accessoires
    (casquette, lunettes, nœud…) vont donc sur tous les animaux.
    ========================================================= */
@@ -18,6 +19,7 @@
     lapin:  { pelage: '#e5e7eb', clair: '#ffffff', oreilles: '#f2b3b3', yeux: '#1f2937', nez: '#f472b6' },
     cheval: { pelage: '#8b5a2b', clair: '#f5f5f4', oreilles: '#5b3a1a', criniere: '#2b1a10', yeux: '#1f1f1f', nez: '#3f2a1a' },
     tortue: { pelage: '#d6c393', carapace: '#2a2219', bord: '#e6c463', yeux: '#2b1d10' },
+    humain: { peau: '#f1c7a5', cheveux: '#4a2c17', yeux: '#3b2416', tshirt: '#111827', motif: '#9ca3af', barbe: '' },
     oiseau: { pelage: '#38bdf8', clair: '#e0f2fe', ailes: '#0284c7', bec: '#f59e0b', yeux: '#1f2937' }
   };
 
@@ -110,6 +112,28 @@
         <path d="M54 86 q6 4 12 0" stroke="${k.nez}" stroke-width="2" fill="none" stroke-linecap="round"/>
         <path d="M56 92 Q60 108 64 92" stroke="${k.criniere}" stroke-width="5" fill="none"/>`;
     },
+    humain(k, mood) {
+      /* Une personne en buste (tête centrée en 60, 52) : cheveux, peau, t-shirt */
+      const long = k.coupe === 'longs';
+      const yeuxH = mood === 'think'
+        ? `<path d="M45 54 q5 -4 10 0 M65 54 q5 -4 10 0" stroke="${k.yeux}" stroke-width="3" fill="none" stroke-linecap="round"/>`
+        : [50, 70].map(x => `<ellipse cx="${x}" cy="54" rx="3.4" ry="4.2" fill="${k.yeux}"/><circle cx="${x + 1}" cy="52.5" r="1.2" fill="#fff"/>`).join('');
+      const barbe = k.barbe ? `<path d="M38 60 Q40 84 60 86 Q80 84 82 60 Q76 74 60 74 Q44 74 38 60 Z" fill="${k.barbe}"/>` : '';
+      return `${ombre(36)}
+        ${long ? `<path d="M32 44 Q30 96 40 104 L80 104 Q90 96 88 44 Z" fill="${k.cheveux}"/>` : ''}
+        <path d="M18 128 Q18 92 44 86 L76 86 Q102 92 102 128 Z" fill="${k.tshirt}"/>
+        <path d="M50 86 Q60 96 70 86" stroke="#374151" stroke-width="3" fill="none"/>
+        <path d="M48 106 L60 98 L72 106 L66 118 L54 118 Z" fill="none" stroke="${k.motif}" stroke-width="2.5" stroke-linejoin="round"/>
+        <rect x="53" y="74" width="14" height="14" fill="${k.peau}"/>
+        <ellipse cx="60" cy="52" rx="22" ry="26" fill="${k.peau}"/>
+        <ellipse cx="37" cy="54" rx="4" ry="6" fill="${k.peau}"/><ellipse cx="83" cy="54" rx="4" ry="6" fill="${k.peau}"/>
+        <path d="M36 50 Q34 22 60 22 Q86 22 84 50 Q80 34 66 32 Q56 38 40 38 Q37 42 36 50 Z" fill="${k.cheveux}"/>
+        <path d="M46 46 h9 M65 46 h9" stroke="${k.cheveux}" stroke-width="3" stroke-linecap="round"/>
+        ${yeuxH}
+        <path d="M60 56 q-3 7 1 8" stroke="#c08a6a" stroke-width="2" fill="none" stroke-linecap="round"/>
+        ${barbe}
+        <path d="M52 68 q8 6 16 0" stroke="#9a3b2b" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+    },
     oiseau(k, mood) {
       /* Oiseau rond : tête centrée en (60, 52) comme les autres */
       return `${ombre(30)}
@@ -147,8 +171,8 @@
     }
   };
   Z.ESPECES = Object.keys(DESSINS);
-  Z.NOM_ESPECE = { chat: ['chat', 'chats'], chien: ['chien', 'chiens'], lapin: ['lapin', 'lapins'], cheval: ['cheval', 'chevaux'], tortue: ['tortue', 'tortues'], oiseau: ['oiseau', 'oiseaux'] };
-  Z.CRI = { chat: 'Miaou !', chien: 'Ouaf !', lapin: 'Coucou !', cheval: 'Hiii !', tortue: 'Coucou !', oiseau: 'Cui-cui !' };
+  Z.NOM_ESPECE = { chat: ['chat', 'chats'], chien: ['chien', 'chiens'], lapin: ['lapin', 'lapins'], cheval: ['cheval', 'chevaux'], tortue: ['tortue', 'tortues'], oiseau: ['oiseau', 'oiseaux'], humain: ['ami', 'amis'] };
+  Z.CRI = { chat: 'Miaou !', chien: 'Ouaf !', lapin: 'Coucou !', cheval: 'Hiii !', tortue: 'Coucou !', oiseau: 'Cui-cui !', humain: 'Salut !' };
 
   Z.art.animal = function ({ espece = 'chat', couleurs = {}, acc = 'aucun', mood = 'happy', accColor } = {}) {
     const esp = DESSINS[espece] ? espece : 'chat';
@@ -158,7 +182,7 @@
     const acces = accessoire(acc, accColor);
     return `<svg viewBox="0 -4 120 134" class="cat-svg" xmlns="http://www.w3.org/2000/svg">
       ${DESSINS[esp](k, mood)}
-      ${esp !== 'tortue' && esp !== 'cheval' && esp !== 'oiseau' ? collier(k.collier) : ''}
+      ${esp !== 'tortue' && esp !== 'cheval' && esp !== 'oiseau' && esp !== 'humain' ? collier(k.collier) : ''}
       ${acces ? `<g transform="translate(0 ${dy})">${acces}</g>` : ''}
     </svg>`;
   };

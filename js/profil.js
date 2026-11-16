@@ -36,7 +36,7 @@ var PROFIL = {
   enfant: {
     pseudo: 'Adeline',         // le nom affiché et dit à voix haute (prénom seul)
     genre: 'fille',            // 'garçon' ou 'fille' (pour accorder : « prêt / prête »…)
-    numero: 42,                // numéro du dossard
+    numero: 42,
     apparence: {
       peau: '#f1c7a5',
       cheveux: '#6b4423',
@@ -78,28 +78,34 @@ var PROFIL = {
   },
 
   /* --- Les passions --- */
-  univers: 'trail',
-  passions: ['trail'],
+  univers: 'moto',             // le garage : motos à acheter
+  passions: ['moto', 'trail'], // le trail reste dans les problèmes et les calculs
 
   /* --- Les animaux guides ---
      Moustache = son chat : un grand et vieux chat noir et blanc.
+     Sylvain = son chéri (grand, cheveux bruns, t-shirt noir sobre) : il présente les devoirs.
      */
   animaux: [
-    { id: 'moustache', nom: 'Moustache', espece: 'chat', roles: ['accueil', 'francais', 'mots', 'devoirs'],
+    { id: 'moustache', nom: 'Moustache', espece: 'chat', roles: ['accueil', 'francais', 'mots'],
       couleurs: { pelage: '#1c1c1f', clair: '#f8fafc', taches: '#1c1c1f', oreilles: '#f2b3b3', yeux: '#a3c43b', nez: '#e79a9a', collier: '#0d9488' },
       voix: { hauteur: 1.0, vitesse: 0.88 } },
     { id: 'pirouette', nom: 'Pirouette', espece: 'oiseau', roles: ['maths', 'problemes', 'tables'],
       couleurs: { pelage: '#38bdf8', clair: '#fef08a', ailes: '#0369a1', bec: '#374151', yeux: '#111827' },
       voix: { hauteur: 1.5, vitesse: 1.05 } },
+    { id: 'sylvain', nom: 'Sylvain', espece: 'humain', roles: ['devoirs'],
+      couleurs: { peau: '#f1c7a5', cheveux: '#4a2c17', yeux: '#3b2416', tshirt: '#111827', motif: '#9ca3af' },
+      voix: { hauteur: 0.82, vitesse: 0.95 } },
     { id: 'rouquine', nom: 'Rouquine', espece: 'oiseau', roles: ['histoire'],
       couleurs: { pelage: '#a16207', clair: '#f97316', ailes: '#78350f', bec: '#1f2937', yeux: '#111827' },
       voix: { hauteur: 1.35, vitesse: 0.98 } }
   ],
 
-  entourage: [],
+  entourage: [
+    { nom: 'Sylvain', emoji: '🤘', homme: true }
+  ],
   encouragements: [
-    'Bravo @enfant, belle foulée !', 'Quelle endurance, @enfant !', 'Encore un sommet de passé !',
-    'Pense à ramasser les miettes de pomme, et on continue !', 'Tu mérites une petite mousse, @enfant !'
+    'Bravo @enfant, plein gaz !', 'Quelle endurance, @enfant !', 'Encore un sommet de passé !',
+    'Pense à ramasser les miettes de pomme, et on continue !', 'Tu mérites une petite mousse, @enfant !', 'Ça, c\'est du métal, @enfant ! 🤘'
   ],
 
   motsEnPlus: [],

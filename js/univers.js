@@ -4,7 +4,7 @@
    Un univers = l'objet à décorer dans la boutique + son dessin,
    le décor, les titres des jeux, les autocollants, des mots et
    des problèmes sur ce thème.
-   Univers disponibles : trottinette · foot · karate · dinosaures · trail
+   Univers disponibles : trottinette · foot · karate · dinosaures · trail · moto
    Dans les textes : @enfant = le pseudo, @il = il/elle,
    @guide = l'animal d'accueil, @animal / @animaux = son espèce.
 
@@ -390,5 +390,123 @@ UNIVERS.trail = {
     { id: 'tr1', e: '🏃', n: 'Coureur', r: 1 }, { id: 'tr2', e: '⛰️', n: 'Montagne', r: 1 }, { id: 'tr3', e: '🌲', n: 'Forêt', r: 1 },
     { id: 'tr4', e: '👟', n: 'Chaussure', r: 1 }, { id: 'tr5', e: '🔦', n: 'Frontale', r: 2 }, { id: 'tr6', e: '🏔️', n: 'Sommet', r: 2 },
     { id: 'tr7', e: '🏅', n: 'Finisher', r: 3 }
+  ]
+};
+
+/* =========================================================
+   6. LA MOTO (route, cross, roadster, course)
+   Le « modèle » = la moto ; la jauge = sa vitesse.
+   Les marques sont juste des noms : les dessins restent génériques.
+   ========================================================= */
+UNIVERS.moto = {
+  nom: 'la moto',
+  objet: 'ta moto',
+  boutique: { titre: 'Le Garage', icone: '🏍️' },
+  jeux: { mots: 'Le Garage des mots', tables: 'Le Grand Prix des tables', problemes: 'Les Enquêtes', parcours: 'Le Permis de la route' },
+  emojiCourse: '🏍️💨🏁',
+  depart: '🏁 Moteur… Partez !',
+  scene: 'route',
+  decor: '🌳   🏠      🌳 🌳     ⛽    🌳     🏠   🌳',
+  jauge: (v, m) => ({ court: `🏍️ Ta ${m.name} roule à `, val: `${v} km/h`, phrase: `Ta ${m.name} roule maintenant à ${v} kilomètres heure !` }),
+  onglets: [
+    { id: 'model', label: '🏍️ Moto', items: [
+      { id: 'route125', name: 'Honda 125 de route', type: 'route', price: 0, lvl: 1, bonus: 0 },
+      { id: 'crossyam', name: 'Yamaha de motocross', type: 'cross', num: '22', price: 100, lvl: 2, bonus: 2 },
+      { id: 'crossktm', name: 'KTM de motocross', type: 'cross', num: '7', price: 160, lvl: 3, bonus: 3 },
+      { id: 'roadkawa', name: 'Kawasaki roadster', type: 'roadster', price: 250, lvl: 5, bonus: 5 },
+      { id: 'routebmw', name: 'BMW grand tourisme', type: 'tourisme', price: 320, lvl: 6, bonus: 6 },
+      { id: 'coursesuz', name: 'Suzuki de course', type: 'course', price: 400, lvl: 7, bonus: 8 },
+      { id: 'courseyam', name: 'Yamaha de course', type: 'course', price: 500, lvl: 8, bonus: 9 },
+      { id: 'courseduc', name: 'Ducati de course', type: 'course', price: 600, lvl: 9, bonus: 10 }] },
+    { id: 'color', label: '🎨 Couleur', items: [
+      { id: 'rouge', name: 'Rouge', c: '#dc2626', price: 0 },
+      { id: 'bleu', name: 'Bleu course', c: '#1d4ed8', price: 30 },
+      { id: 'vert', name: 'Vert pomme', c: '#65a30d', price: 30 },
+      { id: 'orange', name: 'Orange cross', c: '#f97316', price: 40 },
+      { id: 'jaune', name: 'Jaune vif', c: '#facc15', price: 40 },
+      { id: 'noir', name: 'Noir mat', c: '#1f2937', price: 60 },
+      { id: 'metal', name: 'Noir métal et argent', c: '#111827', two: '#9ca3af', price: 70 },
+      { id: 'blancbleu', name: 'Blanc et bleu', c: '#f8fafc', two: '#1d4ed8', price: 80 },
+      { id: 'or', name: 'Or champion', c: '#d4a017', price: 120 }] },
+    { id: 'acc', label: '⛑️ Casque', items: [
+      { id: 'aucun', name: 'Casque intégral blanc', c: '#f8fafc', price: 0 },
+      { id: 'noir', name: 'Casque intégral noir', c: '#111827', price: 30 },
+      { id: 'cross', name: 'Casque de cross', c: '#f97316', price: 50 },
+      { id: 'chat', name: 'Casque à oreilles de chat', c: '#1c1c1f', price: 60 },
+      { id: 'flammes', name: 'Casque flammes', c: '#dc2626', price: 70 },
+      { id: 'viking', name: 'Casque viking', c: '#9ca3af', price: 80 },
+      { id: 'damier', name: 'Casque damier', c: '#f8fafc', price: 90 },
+      { id: 'pointes', name: 'Casque noir à clous', c: '#111827', price: 100 },
+      { id: 'or', name: 'Casque en or', c: '#d4a017', price: 120 }] }
+  ],
+  dessin(o) {
+    const m = o.model, c = o.color.c, c2 = o.color.two || '#111827', cas = o.acc;
+    const t = m.type || 'route';
+    const cross = t === 'cross', course = t === 'course', tour = t === 'tourisme';
+    const R = cross ? 27 : 25, yR = 146, xA = 52, xB = 170;
+    const crampons = cross ? Array.from({ length: 14 }, (_, i) => { const a = i * Math.PI / 7; return `<rect x="-3" y="${-R - 3}" width="6" height="5" fill="#111827" transform="rotate(${a * 180 / Math.PI})"/>`; }).join('') : '';
+    const roue = (x) => `<g transform="translate(${x} ${yR})"><g class="ball" style="transform-origin:0 0">${crampons}<circle r="${R}" fill="#111827"/><circle r="${R - 7}" fill="#9ca3af"/><circle r="${R - 10}" fill="#4b5563"/>
+      ${[0, 60, 120].map(a => `<rect x="-1.5" y="${-(R - 10)}" width="3" height="${2 * (R - 10)}" fill="#d1d5db" transform="rotate(${a})"/>`).join('')}<circle r="4" fill="#e5e7eb"/></g></g>`;
+    /* Cadre et moteur */
+    const yH = cross ? 96 : 104;
+    const moteur = `<rect x="92" y="${yR - 34}" width="40" height="28" rx="6" fill="#4b5563"/><rect x="98" y="${yR - 30}" width="14" height="20" rx="3" fill="#9ca3af"/>
+      <path d="M100 ${yR - 8} Q86 ${yR + 4} ${xA + 4} ${yR - 2}" stroke="#9ca3af" stroke-width="6" fill="none" stroke-linecap="round"/>`;
+    const fourche = `<path d="M${xB} ${yR} L${xB - 18} ${yH - 18}" stroke="#d1d5db" stroke-width="6" stroke-linecap="round"/>`;
+    const bras = `<path d="M${xA} ${yR} L112 ${yR - 14}" stroke="#374151" stroke-width="7" stroke-linecap="round"/>`;
+    let corps;
+    if (course) {
+      corps = `<path d="M70 ${yH + 4} Q96 ${yH - 14} 128 ${yH - 6} L156 ${yH - 30} Q178 ${yH - 30} 184 ${yH - 4} Q186 ${yH + 22} 160 ${yR - 18} L104 ${yR - 6} Q84 ${yR - 14} 70 ${yH + 4} Z" fill="${c}" stroke="#111827" stroke-width="2"/>
+        <path d="M110 ${yH + 10} L168 ${yH + 2}" stroke="${c2}" stroke-width="7" stroke-linecap="round"/>
+        <path d="M160 ${yH - 28} Q176 ${yH - 40} 182 ${yH - 18} Z" fill="#93c5fd" opacity=".8"/>
+        <path d="M60 ${yH + 2} L96 ${yH - 4} L94 ${yH + 6} L62 ${yH + 10} Z" fill="#111827"/>
+        <circle cx="180" cy="${yH + 2}" r="4" fill="#fef9c3" stroke="#111827"/>`;
+    } else if (cross) {
+      corps = `<path d="M${xB - 30} ${yH - 30} Q${xB + 4} ${yH - 36} ${xB + 18} ${yH - 18} L${xB - 6} ${yH - 18} Z" fill="${c}" stroke="#111827" stroke-width="2"/>
+        <path d="M84 ${yH - 6} L150 ${yH - 12} L146 ${yH + 10} L96 ${yH + 16} Z" fill="${c}" stroke="#111827" stroke-width="2"/>
+        <path d="M50 ${yH - 8} L96 ${yH - 6} L92 ${yH + 2} L56 ${yH + 2} Z" fill="#111827"/>
+        <path d="M30 ${yH - 14} L64 ${yH - 2} L60 ${yH + 6} L34 ${yH - 4} Z" fill="${c2 === '#111827' ? c : c2}" stroke="#111827" stroke-width="2"/>
+        <rect x="${xB - 30}" y="${yH - 12}" width="20" height="18" rx="4" fill="#f8fafc" stroke="#111827" stroke-width="1.5"/>
+        <text x="${xB - 20}" y="${yH + 2}" font-size="12" font-weight="700" text-anchor="middle" fill="#111827" font-family="Arial">${m.num || '1'}</text>`;
+    } else {
+      const sacoches = tour ? `<rect x="34" y="${yH + 4}" width="34" height="26" rx="6" fill="#374151" stroke="#111827" stroke-width="2"/><rect x="40" y="${yH - 22}" width="34" height="20" rx="5" fill="#374151"/>` : '';
+      const bulle = tour ? `<path d="M150 ${yH - 20} L162 ${yH - 46} L172 ${yH - 42} L164 ${yH - 18} Z" fill="#93c5fd" opacity=".8"/>` : '';
+      corps = `${sacoches}<path d="M96 ${yH - 2} Q100 ${yH - 20} 128 ${yH - 20} Q150 ${yH - 20} 150 ${yH} L136 ${yH + 14} L102 ${yH + 14} Z" fill="${c}" stroke="#111827" stroke-width="2"/>
+        <path d="M112 ${yH - 12} L140 ${yH - 12}" stroke="${c2}" stroke-width="5" stroke-linecap="round"/>
+        <path d="M56 ${yH} L100 ${yH - 2} L100 ${yH + 8} L60 ${yH + 10} Z" fill="#111827"/>
+        <path d="M44 ${yH + 2} L60 ${yH + 4}" stroke="${c}" stroke-width="6" stroke-linecap="round"/>
+        ${bulle}<circle cx="${xB - 12}" cy="${yH - 10}" r="${t === 'roadster' ? 7 : 9}" fill="#fef9c3" stroke="#111827" stroke-width="2"/>`;
+    }
+    const guidon = `<path d="M${xB - 22} ${yH - 22} L${xB - 30} ${yH - 30}" stroke="#111827" stroke-width="4" stroke-linecap="round"/>`;
+    /* Pilote */
+    const penche = course ? 1 : 0;
+    const hx = course ? 124 : 112, hy = course ? yH - 40 : yH - 56;
+    const AP = (PROFIL.enfant && PROFIL.enfant.apparence) || {};
+    const queue = /queue|longs/.test(AP.coiffure || '') ? `<path d="M${hx - 12} ${hy + 6} q-16 4 -18 22 q10 -6 16 -14 z" fill="${AP.cheveux || '#4a2c17'}"/>` : '';
+    const pilote = `${queue}<path d="M96 ${yH - 2} L${hx - 6} ${hy + 20}" stroke="#1f2937" stroke-width="16" stroke-linecap="round"/>
+      <path d="M${hx - 4} ${hy + 22} L${xB - 30} ${yH - 28}" stroke="#1f2937" stroke-width="7" stroke-linecap="round"/>
+      <path d="M98 ${yH + 2} L120 ${yH + 22} L118 ${yR - 10}" stroke="#374151" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="112" y="${yR - 14}" width="14" height="7" rx="2" fill="#111827"/>`;
+    const k = cas.c || '#f8fafc', id = cas.id;
+    const deco = {
+      chat: `<path d="M${hx - 14} ${hy - 8} L${hx - 12} ${hy - 26} L${hx - 2} ${hy - 14} Z M${hx + 6} ${hy - 14} L${hx + 14} ${hy - 26} L${hx + 16} ${hy - 8} Z" fill="${k}" stroke="#111827" stroke-width="1.5"/><path d="M${hx - 11} ${hy - 12} L${hx - 10} ${hy - 20} L${hx - 5} ${hy - 14} Z M${hx + 8} ${hy - 14} L${hx + 12} ${hy - 20} L${hx + 13} ${hy - 12} Z" fill="#f2b3b3"/>`,
+      flammes: `<path d="M${hx - 14} ${hy + 4} q6 -10 10 -2 q2 -10 8 -6 q0 6 6 6" stroke="#facc15" stroke-width="3" fill="none"/>`,
+      viking: `<path d="M${hx - 14} ${hy - 6} q-12 -6 -8 -20 q4 10 12 10 z M${hx + 14} ${hy - 6} q12 -6 8 -20 q-4 10 -12 10 z" fill="#fef3c7" stroke="#92400e" stroke-width="1.5"/>`,
+      damier: [0, 1, 2, 3].map(i => `<rect x="${hx - 12 + i * 6}" y="${hy - 12 + (i % 2) * 6}" width="6" height="6" fill="#111827"/><rect x="${hx - 12 + i * 6}" y="${hy - 6 - (i % 2) * 6 + 6}" width="6" height="6" fill="#111827"/>`).join(''),
+      pointes: [-10, -4, 2, 8].map((x, i) => `<path d="M${hx + x - 3} ${hy - 13 + Math.abs(i - 1.5) * 2} l3 -7 l3 7 z" fill="#d1d5db" stroke="#4b5563" stroke-width="1"/>`).join(''),
+      cross: `<path d="M${hx + 8} ${hy - 6} L${hx + 26} ${hy - 2} L${hx + 14} ${hy + 4} Z" fill="${k}" stroke="#111827" stroke-width="1.5"/>`
+    }[id] || '';
+    const casque = `<circle cx="${hx}" cy="${hy}" r="15" fill="${k}" stroke="#111827" stroke-width="2"/>
+      ${id === 'cross' ? `<rect x="${hx + 2}" y="${hy - 4}" width="14" height="9" rx="3" fill="#fbbf24" stroke="#111827" stroke-width="1.5"/>` : `<path d="M${hx + 2} ${hy - 6} Q${hx + 16} ${hy - 6} ${hx + 15} ${hy + 4} L${hx + 2} ${hy + 4} Z" fill="#1e3a8a" opacity=".85"/>`}
+      ${deco}`;
+    return `<svg viewBox="0 0 220 180" class="rider-svg" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="110" cy="174" rx="92" ry="5" fill="rgba(0,0,0,.18)"/>
+      ${roue(xA)}${roue(xB)}${bras}${fourche}${moteur}${corps}${guidon}
+      ${o.rider === false ? '' : pilote + casque}
+    </svg>`;
+  },
+  autocollants: [
+    { id: 'm1', e: '🏍️', n: 'Moto', r: 1 }, { id: 'm2', e: '⛑️', n: 'Casque', r: 1 }, { id: 'm3', e: '🏁', n: 'Drapeau à damier', r: 1 },
+    { id: 'm4', e: '⛽', n: 'Station-service', r: 1 }, { id: 'm5', e: '🛣️', n: 'Route', r: 2 }, { id: 'm6', e: '🏆', n: 'Coupe', r: 2 },
+    { id: 'm7', e: '🥇', n: 'Champion·ne', r: 3 }
   ]
 };
