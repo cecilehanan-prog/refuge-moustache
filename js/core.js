@@ -502,6 +502,10 @@ Z.guide = function (who) {
   return L.find(a => a.id === who) || L.find(a => (a.roles || []).includes(who))
     || L.find(a => (a.roles || []).includes('accueil')) || L[0];
 };
+/* Comment ce guide appelle l'élève (profil : appelle: 'ma chérie'), sinon son prénom */
+Z.nomPour = (who) => Z.guide(who).appelle || Z.state.name;
+/* Comment l'élève présente ce guide (profil : presente: 'mon chéri Sylvain'), sinon son nom */
+Z.presente = (who) => Z.guide(who).presente || Z.guide(who).nom;
 Z.catKey = (id) => 'animal_' + Z.guide(id).id;
 /* Dessin d'un guide (avec l'accessoire acheté dans la boutique) */
 Z.art.cat = function ({ acc, mood = 'happy', who } = {}) {
@@ -532,7 +536,8 @@ Z.familySays = function (p, text, { speak = true } = {}) {
   const fv = Z.familyVoice(p);
   if (speak) Z.speak(text, fv);
   return Z.h('div', { class: 'guide-says' },
-    Z.h('div', { class: 'art mini-cat emoji-face' }, p.emoji || '🙂'),
+    (() => { const g = PROFIL.animaux.find(a => a.espece === 'humain' && a.nom === p.name);
+      return g && Z.GUIDES ? Z.svg(Z.art.cat({ who: g.id }), 'mini-cat') : Z.h('div', { class: 'art mini-cat emoji-face' }, p.emoji || '🙂'); })(),
     Z.h('div', { class: 'bubble' }, Z.h('span', null, text), Z.ear(text, fv)));
 };
 

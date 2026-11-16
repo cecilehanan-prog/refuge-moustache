@@ -74,7 +74,7 @@
     const left = items.filter(i => !s.done[i.id]).length;
     const hello = Z.state.guideDevoirsMet ? '' : `Moi c’est ${Z.guide('devoirs').nom}. Je t’aide pour tes devoirs : doucement, mais sûrement ! `;
     if (!Z.state.guideDevoirsMet) { Z.state.guideDevoirsMet = true; Z.save(); }
-    const t = left ? `Salut ${Z.state.name} ! ${hello}Voici tes devoirs. Il en reste ${left}. Choisis par où tu commences !` : `${hello}Bravo ${Z.state.name}, tous tes devoirs sont faits ! Tu peux imprimer la feuille pour ${PROFIL.appli.ecole || 'l’école'}.`;
+    const t = left ? `Salut ${Z.nomPour('devoirs')} ! ${hello}Voici tes devoirs. Il en reste ${left}. Choisis par où tu commences !` : `${hello}Bravo ${Z.nomPour('devoirs')}, tous tes devoirs sont faits ! Tu peux imprimer la feuille pour ${PROFIL.appli.ecole || 'l’école'}.`;
     shell.root.append(
       h('h2', null, '📚 Mes devoirs'),
       Z.guideSays(t),

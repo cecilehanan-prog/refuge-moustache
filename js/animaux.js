@@ -8,7 +8,7 @@
      oreilles = intérieur ou oreilles     taches = rayures / taches
      yeux     = couleur des yeux          collier = couleur du collier
      (tortue : carapace, bord · oiseau : ailes, bec ·
-     humain : peau, cheveux, coupe 'courts'|'longs', yeux, tshirt, motif, barbe)
+     humain : peau, cheveux, coupe 'courts'|'longs', yeux, tshirt, motif, barbe, bouc)
    La tête est toujours centrée en (60, 52) : les accessoires
    (casquette, lunettes, nœud…) vont donc sur tous les animaux.
    ========================================================= */
@@ -118,6 +118,9 @@
       const yeuxH = mood === 'think'
         ? `<path d="M45 54 q5 -4 10 0 M65 54 q5 -4 10 0" stroke="${k.yeux}" stroke-width="3" fill="none" stroke-linecap="round"/>`
         : [50, 70].map(x => `<ellipse cx="${x}" cy="54" rx="3.4" ry="4.2" fill="${k.yeux}"/><circle cx="${x + 1}" cy="52.5" r="1.2" fill="#fff"/>`).join('');
+      /* Petit bouc (barbichette au menton + fine moustache) */
+      const bouc = k.bouc ? `<path d="M53 73 Q60 71 67 73 Q66 82 60 85 Q54 82 53 73 Z" fill="${k.bouc}"/>
+        <path d="M51 64.5 Q60 61 69 64.5 Q60 63.5 51 64.5 Z" fill="${k.bouc}" stroke="${k.bouc}" stroke-width="1.6" stroke-linejoin="round"/>` : '';
       const barbe = k.barbe ? `<path d="M38 60 Q40 84 60 86 Q80 84 82 60 Q76 74 60 74 Q44 74 38 60 Z" fill="${k.barbe}"/>` : '';
       return `${ombre(36)}
         ${long ? `<path d="M32 44 Q30 96 40 104 L80 104 Q90 96 88 44 Z" fill="${k.cheveux}"/>` : ''}
@@ -131,7 +134,7 @@
         <path d="M46 46 h9 M65 46 h9" stroke="${k.cheveux}" stroke-width="3" stroke-linecap="round"/>
         ${yeuxH}
         <path d="M60 56 q-3 7 1 8" stroke="#c08a6a" stroke-width="2" fill="none" stroke-linecap="round"/>
-        ${barbe}
+        ${barbe}${bouc}
         <path d="M52 68 q8 6 16 0" stroke="#9a3b2b" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
     },
     oiseau(k, mood) {

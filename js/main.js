@@ -71,7 +71,7 @@ Z.endScreen = function (shell, { medal, title, eclairs, xp, lines = [], kind, ag
     (() => {
       const cheer = Z.pick(ZDATA.cheers);
       if (ZDATA.family.length) {
-        const f = Z.pick(ZDATA.family); const t = f.name.charAt(0).toUpperCase() + f.name.slice(1) + ' : ' + cheer;
+        const f = Z.pick(ZDATA.family); const t = f.name.charAt(0).toUpperCase() + f.name.slice(1) + ' : ' + (f.cheers && f.cheers.length ? Z.pick(f.cheers) : cheer);
         setTimeout(() => Z.speak(t, Z.familyVoice(f)), 3200); return Z.familySays(f, t, { speak: false });
       }
       setTimeout(() => Z.speak(cheer), 3200); return Z.guideSays(cheer, { speak: false });
@@ -129,7 +129,7 @@ Z.screens.home = function () {
   /* Une tuile par rubrique (matière), puis les devoirs */
   const world = (role, icone, couleur, title, sub, go, args, badge) => h('button', { class: 'world', style: { background: couleur }, onclick: () => { Z.sfx.vroum(); Z.go(go, ...args); } },
     h('span', { class: 'ico' }, Z.GUIDES ? Z.svg(Z.art.cat({ who: role }), 'ico-cat') : icone),
-    h('span', null, (Z.GUIDES ? '' : '') + title, h('small', null, Z.GUIDES ? `Avec ${Z.guide(role).nom} · ${sub}` : sub)), badge ? h('span', { class: 'badge' }, badge) : null);
+    h('span', null, (Z.GUIDES ? '' : '') + title, h('small', null, Z.GUIDES ? `Avec ${Z.presente(role)} · ${sub}` : sub)), badge ? h('span', { class: 'badge' }, badge) : null);
   const acts = st.acts || {};
   const worlds = h('div', { class: 'worlds' },
     Z.rubriques().map(r => {

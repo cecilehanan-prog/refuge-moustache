@@ -481,23 +481,34 @@ UNIVERS.moto = {
     const penche = course ? 1 : 0;
     const hx = course ? 124 : 112, hy = course ? yH - 40 : yH - 56;
     const AP = (PROFIL.enfant && PROFIL.enfant.apparence) || {};
-    const queue = /queue|longs/.test(AP.coiffure || '') ? `<path d="M${hx - 12} ${hy + 6} q-16 4 -18 22 q10 -6 16 -14 z" fill="${AP.cheveux || '#4a2c17'}"/>` : '';
+    /* Longue queue de cheval qui flotte au vent derrière le casque */
+    const HC = AP.cheveux || '#4a2c17';
+    const queue = /queue|longs/.test(AP.coiffure || '') ? `<path d="M${hx - 13} ${hy - 2} Q${hx - 34} ${hy - 4} ${hx - 50} ${hy + 14} Q${hx - 58} ${hy + 24} ${hx - 64} ${hy + 22} Q${hx - 50} ${hy + 30} ${hx - 36} ${hy + 16} Q${hx - 26} ${hy + 8} ${hx - 12} ${hy + 8} Z" fill="${HC}"/>
+      <circle cx="${hx - 15}" cy="${hy + 3}" r="3.5" fill="#dc2626"/>` : '';
     const pilote = `${queue}<path d="M96 ${yH - 2} L${hx - 6} ${hy + 20}" stroke="#1f2937" stroke-width="16" stroke-linecap="round"/>
       <path d="M${hx - 4} ${hy + 22} L${xB - 30} ${yH - 28}" stroke="#1f2937" stroke-width="7" stroke-linecap="round"/>
       <path d="M98 ${yH + 2} L120 ${yH + 22} L118 ${yR - 10}" stroke="#374151" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
       <rect x="112" y="${yR - 14}" width="14" height="7" rx="2" fill="#111827"/>`;
     const k = cas.c || '#f8fafc', id = cas.id;
     const deco = {
-      chat: `<path d="M${hx - 14} ${hy - 8} L${hx - 12} ${hy - 26} L${hx - 2} ${hy - 14} Z M${hx + 6} ${hy - 14} L${hx + 14} ${hy - 26} L${hx + 16} ${hy - 8} Z" fill="${k}" stroke="#111827" stroke-width="1.5"/><path d="M${hx - 11} ${hy - 12} L${hx - 10} ${hy - 20} L${hx - 5} ${hy - 14} Z M${hx + 8} ${hy - 14} L${hx + 12} ${hy - 20} L${hx + 13} ${hy - 12} Z" fill="#f2b3b3"/>`,
-      flammes: `<path d="M${hx - 14} ${hy + 4} q6 -10 10 -2 q2 -10 8 -6 q0 6 6 6" stroke="#facc15" stroke-width="3" fill="none"/>`,
+      chat: `<path d="M${hx - 14} ${hy - 8} L${hx - 12} ${hy - 26} L${hx - 2} ${hy - 15} Z M${hx + 6} ${hy - 15} L${hx + 14} ${hy - 26} L${hx + 16} ${hy - 8} Z" fill="${k}" stroke="#111827" stroke-width="1.5"/><path d="M${hx - 11} ${hy - 12} L${hx - 10} ${hy - 20} L${hx - 5} ${hy - 14} Z M${hx + 8} ${hy - 14} L${hx + 12} ${hy - 20} L${hx + 13} ${hy - 12} Z" fill="#f2b3b3"/>`,
+      flammes: `<path d="M${hx - 12} ${hy + 6} q2 -10 6 -6 q0 -10 6 -10 q-2 4 4 6" stroke="#facc15" stroke-width="3" fill="none" stroke-linecap="round"/>`,
       viking: `<path d="M${hx - 14} ${hy - 6} q-12 -6 -8 -20 q4 10 12 10 z M${hx + 14} ${hy - 6} q12 -6 8 -20 q-4 10 -12 10 z" fill="#fef3c7" stroke="#92400e" stroke-width="1.5"/>`,
-      damier: [0, 1, 2, 3].map(i => `<rect x="${hx - 12 + i * 6}" y="${hy - 12 + (i % 2) * 6}" width="6" height="6" fill="#111827"/><rect x="${hx - 12 + i * 6}" y="${hy - 6 - (i % 2) * 6 + 6}" width="6" height="6" fill="#111827"/>`).join(''),
+      damier: [0, 1, 2].map(i => `<rect x="${hx - 13 + i * 5}" y="${hy - 12 + (i % 2) * 5}" width="5" height="5" fill="#111827"/><rect x="${hx - 13 + i * 5}" y="${hy - 2 - (i % 2) * 5}" width="5" height="5" fill="#111827"/>`).join(''),
       pointes: [-10, -4, 2, 8].map((x, i) => `<path d="M${hx + x - 3} ${hy - 13 + Math.abs(i - 1.5) * 2} l3 -7 l3 7 z" fill="#d1d5db" stroke="#4b5563" stroke-width="1"/>`).join(''),
-      cross: `<path d="M${hx + 8} ${hy - 6} L${hx + 26} ${hy - 2} L${hx + 14} ${hy + 4} Z" fill="${k}" stroke="#111827" stroke-width="1.5"/>`
+      cross: `<path d="M${hx + 10} ${hy - 16} L${hx + 28} ${hy - 12} L${hx + 16} ${hy - 8} Z" fill="${k}" stroke="#111827" stroke-width="1.5"/>`
     }[id] || '';
-    const casque = `<circle cx="${hx}" cy="${hy}" r="15" fill="${k}" stroke="#111827" stroke-width="2"/>
-      ${id === 'cross' ? `<rect x="${hx + 2}" y="${hy - 4}" width="14" height="9" rx="3" fill="#fbbf24" stroke="#111827" stroke-width="1.5"/>` : `<path d="M${hx + 2} ${hy - 6} Q${hx + 16} ${hy - 6} ${hx + 15} ${hy + 4} L${hx + 2} ${hy + 4} Z" fill="#1e3a8a" opacity=".85"/>`}
-      ${deco}`;
+    /* Casque ouvert (jet) : on voit le visage de l'élève */
+    const peau = AP.peau || '#f1c7a5', yeuxC = AP.yeux || '#3b2416';
+    const visage = `<circle cx="${hx + 2}" cy="${hy + 2}" r="12" fill="${peau}"/>
+      <path d="M${hx - 4} ${hy - 6} Q${hx + 6} ${hy - 9} ${hx + 14} ${hy - 3} L${hx + 14} ${hy - 7} Q${hx + 4} ${hy - 13} ${hx - 6} ${hy - 8} Z" fill="${HC}"/>
+      <ellipse cx="${hx + 3}" cy="${hy + 1}" rx="1.8" ry="2.3" fill="${yeuxC}"/><ellipse cx="${hx + 10}" cy="${hy + 1}" rx="1.8" ry="2.3" fill="${yeuxC}"/>
+      <circle cx="${hx + 3.6}" cy="${hy}" r=".7" fill="#fff"/><circle cx="${hx + 10.6}" cy="${hy}" r=".7" fill="#fff"/>
+      <path d="M${hx + 3} ${hy + 7} q4 4 8 0" stroke="#9a3b2b" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <circle cx="${hx}" cy="${hy + 6}" r="2.2" fill="#f4a7a0" opacity=".55"/><circle cx="${hx + 13}" cy="${hy + 6}" r="2" fill="#f4a7a0" opacity=".55"/>`;
+    const coque = `<path d="M${hx - 14} ${hy + 10} Q${hx - 18} ${hy - 16} ${hx + 2} ${hy - 16} Q${hx + 18} ${hy - 16} ${hx + 17} ${hy - 6} L${hx + 15} ${hy - 4} Q${hx + 2} ${hy - 12} ${hx - 6} ${hy - 4} Q${hx - 8} ${hy + 4} ${hx - 6} ${hy + 12} Z" fill="${k}" stroke="#111827" stroke-width="2" stroke-linejoin="round"/>
+      ${id === 'cross' ? `<rect x="${hx - 2}" y="${hy - 17}" width="14" height="5" rx="2" fill="#fbbf24" stroke="#111827" stroke-width="1.2"/>` : `<path d="M${hx - 2} ${hy - 17} Q${hx + 10} ${hy - 20} ${hx + 18} ${hy - 13} L${hx + 15} ${hy - 10} Q${hx + 8} ${hy - 15} ${hx - 2} ${hy - 13} Z" fill="#93c5fd" opacity=".75"/>`}`;
+    const casque = `${visage}${coque}${deco}`;
     return `<svg viewBox="0 0 220 180" class="rider-svg" xmlns="http://www.w3.org/2000/svg">
       <ellipse cx="110" cy="174" rx="92" ry="5" fill="rgba(0,0,0,.18)"/>
       ${roue(xA)}${roue(xB)}${bras}${fourche}${moteur}${corps}${guidon}

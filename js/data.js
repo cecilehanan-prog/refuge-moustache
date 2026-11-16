@@ -388,5 +388,5 @@ ZDATA.retry = [
 ];
 
 /* L'entourage qui encourage à la fin des jeux (facultatif) */
-ZDATA.family = PROFIL.entourage.map((p, i) => ({ id: 'p' + i, name: p.nom, emoji: p.emoji || '🙂', homme: !!p.homme }));
+ZDATA.family = PROFIL.entourage.map((p, i) => ({ id: 'p' + i, name: p.nom, emoji: p.emoji || '🙂', homme: !!p.homme, cheers: (p.encouragements || []).map(s => ZDATA.remplir(s)) }));
 ZDATA.cheers = (PROFIL.encouragements && PROFIL.encouragements.length ? PROFIL.encouragements : ['Bravo @enfant !', 'Trop fort, @enfant !', 'Continue comme ça !']).map(s => ZDATA.remplir(s));

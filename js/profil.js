@@ -83,7 +83,7 @@ var PROFIL = {
 
   /* --- Les animaux guides ---
      Moustache = son chat : un grand et vieux chat noir et blanc.
-     Sylvain = son chéri (grand, cheveux bruns, t-shirt noir sobre) : il présente les devoirs.
+     Sylvain = son chéri (grand, cheveux bruns, petit bouc, t-shirt noir sobre) : il présente les devoirs.
      */
   animaux: [
     { id: 'moustache', nom: 'Moustache', espece: 'chat', roles: ['accueil', 'francais', 'mots'],
@@ -93,7 +93,8 @@ var PROFIL = {
       couleurs: { pelage: '#38bdf8', clair: '#fef08a', ailes: '#0369a1', bec: '#374151', yeux: '#111827' },
       voix: { hauteur: 1.5, vitesse: 1.05 } },
     { id: 'sylvain', nom: 'Sylvain', espece: 'humain', roles: ['devoirs'],
-      couleurs: { peau: '#f1c7a5', cheveux: '#4a2c17', yeux: '#3b2416', tshirt: '#111827', motif: '#9ca3af' },
+      appelle: 'ma chérie', presente: 'mon chéri Sylvain',
+      couleurs: { peau: '#f1c7a5', cheveux: '#4a2c17', yeux: '#3b2416', tshirt: '#111827', motif: '#9ca3af', bouc: '#4a2c17' },
       voix: { hauteur: 0.82, vitesse: 0.95 } },
     { id: 'rouquine', nom: 'Rouquine', espece: 'oiseau', roles: ['histoire'],
       couleurs: { pelage: '#a16207', clair: '#f97316', ailes: '#78350f', bec: '#1f2937', yeux: '#111827' },
@@ -101,11 +102,13 @@ var PROFIL = {
   ],
 
   entourage: [
-    { nom: 'Sylvain', emoji: '🤘', homme: true }
+    { nom: 'Sylvain', emoji: '🤘', homme: true,
+      encouragements: ['Bravo ma chérie !', 'Trop forte, ma chérie ! 🤘', 'Je suis fier de toi, ma chérie !',
+        'Ça, c\'est du métal, ma chérie ! 🤘', 'Allez ma chérie, encore un et on se fait une petite mousse !'] }
   ],
   encouragements: [
     'Bravo @enfant, plein gaz !', 'Quelle endurance, @enfant !', 'Encore un sommet de passé !',
-    'Pense à ramasser les miettes de pomme, et on continue !', 'Tu mérites une petite mousse, @enfant !', 'Ça, c\'est du métal, @enfant ! 🤘'
+    'Pense à ramasser les miettes de pomme, et on continue !', 'Tu mérites une petite mousse, @enfant !'
   ],
 
   motsEnPlus: [],
