@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <title>Mon appli</title>
+  <meta name="theme-color" content="#2563eb">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <!-- iPhone : icône, plein écran, nom sous l'icône -->
+  <link rel="apple-touch-icon" href="icons/icon-512.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Mon appli">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Lexend:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app"></div>
+  <!-- profil.js = le seul fichier à remplir pour chaque élève -->
+  <script src="js/profil.js"></script>
+  <script src="js/univers.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/animaux.js"></script>
+  <!-- contenu.js = les activités de l'élève, rangées par rubrique -->
+  <script src="js/contenu.js"></script>
+  <script src="js/moteurs.js"></script>
+  <script src="js/game-mots.js"></script>
+  <script src="js/game-tables.js"></script>
+  <script src="js/game-problemes.js"></script>
+  <script src="js/game-route.js"></script>
+  <script src="js/devoirs-data.js"></script>
+  <script src="js/devoirs-archives.js"></script>
+  <script src="js/devoirs.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+  </script>
+</body>
+</html>
