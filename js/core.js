@@ -535,3 +535,35 @@ Z.familySays = function (p, text, { speak = true } = {}) {
     Z.h('div', { class: 'art mini-cat emoji-face' }, p.emoji || '🙂'),
     Z.h('div', { class: 'bubble' }, Z.h('span', null, text), Z.ear(text, fv)));
 };
+
+/* ---------- Typographie française : la ponctuation ne commence jamais une ligne ----------
+   Partout dans la page (même le texte ajouté plus tard), l'espace avant ? ! : ; » % € ) … . ,
+   et après « ( devient une espace insécable : le signe reste collé au mot qui le précède. */
+(function () {
+  const AVANT = /[ \t\n]+(?=[?!:;»%€)….,])/g, APRES = /([«(])[ \t\n]+/g, NB = ' ';
+  const SAUTE = { SCRIPT: 1, STYLE: 1, TEXTAREA: 1, INPUT: 1 };
+  function fixe(n) {
+    const p = n.parentNode;
+    if (!p || SAUTE[p.nodeName] || (p.closest && p.closest('[contenteditable]'))) return;
+    const t = n.data.replace(AVANT, NB).replace(APRES, '$1' + NB);
+    /* « Bonjour » et « ! » dans deux morceaux de texte voisins */
+    const prev = n.previousSibling;
+    if (/^[?!:;»…]/.test(t) && prev && prev.nodeType === 3 && /[ \t]$/.test(prev.data)) prev.data = prev.data.replace(/[ \t]+$/, NB);
+    if (t !== n.data) n.data = t;
+  }
+  function parcourt(root) {
+    if (root.nodeType === 3) return fixe(root);
+    if (root.nodeType !== 1 || SAUTE[root.nodeName]) return;
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const l = [];
+    while (w.nextNode()) l.push(w.currentNode);
+    l.forEach(fixe);
+  }
+  function demarre() {
+    parcourt(document.body);
+    new MutationObserver(ms => ms.forEach(m => {
+      if (m.type === 'characterData') fixe(m.target); else m.addedNodes.forEach(parcourt);
+    })).observe(document.body, { childList: true, subtree: true, characterData: true });
+  }
+  if (document.body) demarre(); else document.addEventListener('DOMContentLoaded', demarre);
+})();
