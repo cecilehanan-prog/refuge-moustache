@@ -4,7 +4,8 @@
    Un univers = l'objet à décorer dans la boutique + son dessin,
    le décor, les titres des jeux, les autocollants, des mots et
    des problèmes sur ce thème.
-   Univers disponibles : trottinette · foot · karate · dinosaures · trail · moto
+   Univers disponibles : trottinette · foot · karate · dinosaures · trail · moto ·
+                         danse · velo · peinture · musique
    Dans les textes : @enfant = le pseudo, @il = il/elle,
    @guide = l'animal d'accueil, @animal / @animaux = son espèce.
 
@@ -31,10 +32,11 @@ function dessinEnfant(o) {
   const legsY = t + 80, footY = t + 142;
   const sleeve = gi ? 12 : 9;
   const punch = o.pose === 'punch';
-  const armL = punch ? `M${cx - 14} ${t + 46} Q${cx - 6} ${t + 64} ${cx + 6} ${t + 58}` : `M${cx - 15} ${t + 44} L${cx - 26} ${t + 80}`;
-  const armR = punch ? `M${cx + 14} ${t + 46} L${cx + 52} ${t + 46}` : `M${cx + 15} ${t + 44} L${cx + 26} ${t + 80}`;
-  const handL = punch ? [cx + 8, t + 58] : [cx - 27, t + 83];
-  const handR = punch ? [cx + 56, t + 46] : [cx + 27, t + 83];
+  let armL = punch ? `M${cx - 14} ${t + 46} Q${cx - 6} ${t + 64} ${cx + 6} ${t + 58}` : `M${cx - 15} ${t + 44} L${cx - 26} ${t + 80}`;
+  let armR = punch ? `M${cx + 14} ${t + 46} L${cx + 52} ${t + 46}` : `M${cx + 15} ${t + 44} L${cx + 26} ${t + 80}`;
+  let handL = punch ? [cx + 8, t + 58] : [cx - 27, t + 83];
+  let handR = punch ? [cx + 56, t + 46] : [cx + 27, t + 83];
+  if (o.bras) ({ L: armL, R: armR, hL: handL, hR: handR } = o.bras);
   const handCol = o.gants || skin;
   const handR2 = o.gants ? 7.5 : 5.5;
   let body;
@@ -519,5 +521,305 @@ UNIVERS.moto = {
     { id: 'm1', e: '🏍️', n: 'Moto', r: 1 }, { id: 'm2', e: '⛑️', n: 'Casque', r: 1 }, { id: 'm3', e: '🏁', n: 'Drapeau à damier', r: 1 },
     { id: 'm4', e: '⛽', n: 'Station-service', r: 1 }, { id: 'm5', e: '🛣️', n: 'Route', r: 2 }, { id: 'm6', e: '🏆', n: 'Coupe', r: 2 },
     { id: 'm7', e: '🥇', n: 'Champion·ne', r: 3 }
+  ]
+};
+
+/* =========================================================
+   7. LA DANSE (la tenue de scène ; la jauge = le public)
+   ========================================================= */
+UNIVERS.danse = {
+  nom: 'la danse',
+  objet: 'ta tenue de danse',
+  boutique: { titre: 'La Loge', icone: '🩰' },
+  jeux: { mots: 'Le Ballet des mots', tables: 'La Chorégraphie des tables', problemes: 'Les Enquêtes', parcours: 'Le Permis de la route' },
+  emojiCourse: '💃✨🎶',
+  depart: '🎶 5, 6, 7, 8… On danse !',
+  scene: 'spectacle',
+  decor: '✨      🎭        ✨        🌟       ✨',
+  jauge: (v, m) => ({ court: '💃 Ton public : ', val: `${v * 10} spectateurs`, phrase: `Ton spectacle attire maintenant ${v * 10} spectateurs !` }),
+  onglets: [
+    { id: 'model', label: '🩰 Tenue', items: [
+      { id: 'justau', name: 'Justaucorps', type: 'justau', price: 0, lvl: 1, bonus: 0 },
+      { id: 'hiphop', name: 'Tenue de hip-hop', type: 'hiphop', price: 100, lvl: 2, bonus: 2 },
+      { id: 'tutu', name: 'Tutu de ballet', type: 'tutu', price: 180, lvl: 4, bonus: 4 },
+      { id: 'salsa', name: 'Robe de salsa', type: 'robe', price: 300, lvl: 6, bonus: 6 },
+      { id: 'etoile', name: 'Tutu de danseuse étoile', type: 'etoile', price: 600, lvl: 9, bonus: 10 }] },
+    { id: 'color', label: '🎨 Couleur', items: [
+      { id: 'rose', name: 'Rose', c: '#f472b6', price: 0 },
+      { id: 'lilas', name: 'Lilas', c: '#c084fc', price: 30 },
+      { id: 'turquoise', name: 'Turquoise', c: '#2dd4bf', price: 30 },
+      { id: 'rouge', name: 'Rouge passion', c: '#dc2626', price: 50 },
+      { id: 'noir', name: 'Noir élégant', c: '#1f2937', price: 60 },
+      { id: 'blanc', name: 'Blanc', c: '#f8fafc', price: 60 },
+      { id: 'or', name: 'Or', c: '#d4a017', price: 120 }] },
+    { id: 'acc', label: '🎀 Accessoire', items: [
+      { id: 'aucun', name: 'Tout simple', price: 0 },
+      { id: 'noeud', name: 'Nœud dans les cheveux', price: 30 },
+      { id: 'bandeau', name: 'Bandeau', price: 30 },
+      { id: 'casquette', name: 'Casquette', price: 40 },
+      { id: 'ruban', name: 'Ruban de gym', price: 60 },
+      { id: 'lunettes', name: 'Lunettes de star', price: 70 },
+      { id: 'medaille', name: 'Médaille du concours', price: 100 },
+      { id: 'couronne', name: 'Diadème', price: 120 }] }
+  ],
+  dessin(o) {
+    const cx = 100, t = 12, hy = t + 20, legsY = t + 80, a = o.acc.id, c = o.color.c, k = o.model.type;
+    const bras = { L: `M${cx - 15} ${t + 44} Q${cx - 36} ${t + 30} ${cx - 27} ${t + 8}`, R: `M${cx + 15} ${t + 44} Q${cx + 36} ${t + 42} ${cx + 42} ${t + 26}`, hL: [cx - 26, t + 5], hR: [cx + 43, t + 23] };
+    const hiphop = k === 'hiphop';
+    let jupe = '';
+    if (k === 'tutu' || k === 'etoile') jupe = `<ellipse cx="${cx}" cy="${legsY - 2}" rx="36" ry="9" fill="${c}" opacity=".95"/><ellipse cx="${cx}" cy="${legsY - 5}" rx="30" ry="6" fill="#fff" opacity=".45"/>
+      ${k === 'etoile' ? [-24, -12, 0, 12, 24].map(x => `<circle cx="${cx + x}" cy="${legsY - 1}" r="1.8" fill="#facc15"/>`).join('') : ''}`;
+    if (k === 'robe') jupe = `<path d="M${cx - 17} ${legsY - 8} L${cx - 34} ${legsY + 30} Q${cx} ${legsY + 40} ${cx + 34} ${legsY + 30} L${cx + 17} ${legsY - 8} Z" fill="${c}"/><path d="M${cx - 34} ${legsY + 30} q8 6 17 2 q9 6 17 0 q9 6 17 0 q9 6 17 -2" stroke="#fff" stroke-width="2" fill="none" opacity=".6"/>`;
+    const pantalon = hiphop ? `<path d="M${cx - 19} ${legsY - 6} L${cx - 22} ${legsY + 58} L${cx - 3} ${legsY + 58} L${cx} ${legsY + 14} L${cx + 3} ${legsY + 58} L${cx + 22} ${legsY + 58} L${cx + 19} ${legsY - 6} Z" fill="#374151"/>` : '';
+    const ruban = a === 'ruban' ? `<path d="M${cx + 43} ${t + 23} Q${cx + 70} ${t - 4} ${cx + 60} ${t + 40} Q${cx + 50} ${t + 80} ${cx + 82} ${t + 70}" stroke="#ec4899" stroke-width="4" fill="none" stroke-linecap="round"/>` : '';
+    const noeud = a === 'noeud' ? `<path d="M${cx + 9} ${hy - 16} l-9 -6 v12 z M${cx + 9} ${hy - 16} l9 -6 v12 z" fill="#ec4899"/><circle cx="${cx + 9}" cy="${hy - 16}" r="2.8" fill="#be185d"/>` : '';
+    const head = (a === 'noeud' || a === 'ruban') ? '' : accEnfant(a, cx, t);
+    return `<svg viewBox="0 0 220 180" class="rider-svg" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="110" cy="172" rx="80" ry="6" fill="rgba(0,0,0,.25)"/>
+      ${dessinEnfant({ cx, top: t, shirt: hiphop ? '#f8fafc' : c, shorts: hiphop ? '#374151' : c, socks: hiphop ? '#374151' : '#fbcfe8', shoes: hiphop ? '#f8fafc' : '#f9a8d4', bras, head: head + noeud })}
+      ${pantalon}${jupe}${ruban}
+      ${hiphop ? `<rect x="${cx - 12}" y="${t + 50}" width="24" height="10" rx="3" fill="${c}"/>` : ''}
+    </svg>`;
+  },
+  autocollants: [
+    { id: 'da1', e: '💃', n: 'Danseuse', r: 1 }, { id: 'da2', e: '🩰', n: 'Chaussons', r: 1 }, { id: 'da3', e: '🎶', n: 'Musique', r: 1 },
+    { id: 'da4', e: '🎭', n: 'Spectacle', r: 1 }, { id: 'da5', e: '🕺', n: 'Danseur', r: 2 }, { id: 'da6', e: '🌟', n: 'Étoile', r: 2 },
+    { id: 'da7', e: '🏆', n: 'Premier prix', r: 3 }
+  ]
+};
+
+/* =========================================================
+   8. LE VÉLO (le vélo à décorer ; la jauge = sa vitesse)
+   ========================================================= */
+UNIVERS.velo = {
+  nom: 'le vélo',
+  objet: 'ton vélo',
+  boutique: { titre: 'L\'Atelier vélo', icone: '🔧' },
+  jeux: { mots: 'Le Tour des mots', tables: 'Le Sprint des tables', problemes: 'Les Enquêtes', parcours: 'Le Permis de la route' },
+  emojiCourse: '🚴💨🏁',
+  depart: '🔔 Dring dring… Pédale !',
+  scene: 'route',
+  decor: '🌳   🏠      🌳 🌳     🚦    🌳     🏠   🌳',
+  jauge: (v, m) => ({ court: '🚲 Ton vélo roule à ', val: `${v} km/h`, phrase: `Ton vélo roule maintenant à ${v} kilomètres heure !` }),
+  onglets: [
+    { id: 'model', label: '🚲 Vélo', items: [
+      { id: 'ville', name: 'Vélo de ville', type: 'ville', price: 0, lvl: 1, bonus: 0 },
+      { id: 'bmx', name: 'BMX', type: 'bmx', price: 100, lvl: 2, bonus: 2 },
+      { id: 'vtt', name: 'VTT', type: 'vtt', price: 200, lvl: 4, bonus: 4 },
+      { id: 'course', name: 'Vélo de course', type: 'course', price: 350, lvl: 6, bonus: 7 },
+      { id: 'or', name: 'Vélo de course en or', type: 'course', gold: 1, price: 600, lvl: 9, bonus: 10 }] },
+    { id: 'color', label: '🎨 Couleur', items: [
+      { id: 'rouge', name: 'Rouge', c: '#dc2626', price: 0 },
+      { id: 'bleu', name: 'Bleu', c: '#2563eb', price: 30 },
+      { id: 'vert', name: 'Vert', c: '#16a34a', price: 30 },
+      { id: 'rose', name: 'Rose', c: '#ec4899', price: 30 },
+      { id: 'violet', name: 'Violet', c: '#7c3aed', price: 40 },
+      { id: 'noir', name: 'Noir mat', c: '#1f2937', price: 60 },
+      { id: 'blancbleu', name: 'Blanc et bleu', c: '#f8fafc', two: '#1d4ed8', price: 80 }] },
+    { id: 'acc', label: '🔔 Accessoire', items: [
+      { id: 'aucun', name: 'Tout simple', price: 0 },
+      { id: 'sonnette', name: 'Sonnette', price: 20 },
+      { id: 'panier', name: 'Panier', price: 40 },
+      { id: 'rubans', name: 'Rubans au guidon', price: 40 },
+      { id: 'lumieres', name: 'Lumières', price: 60 },
+      { id: 'sacoche', name: 'Sacoche', price: 60 },
+      { id: 'fanion', name: 'Fanion', price: 80 }] }
+  ],
+  dessin(o) {
+    const m = o.model, k = m.type, a = o.acc.id;
+    const c = m.gold ? '#d4a017' : o.color.c, c2 = o.color.two;
+    const bmx = k === 'bmx', vtt = k === 'vtt', course = k === 'course';
+    const R = bmx ? 22 : 28, yR = 142, xA = bmx ? 62 : 52, xB = bmx ? 154 : 166, xBB = bmx ? 104 : 102;
+    const S = [bmx ? 92 : 90, yR - (bmx ? 34 : 52)], H = [bmx ? 140 : 148, yR - (bmx ? 38 : 50)];
+    const pneu = vtt ? 7 : course ? 3.5 : 5;
+    const roue = (x) => `<g transform="translate(${x} ${yR})"><g class="ball" style="transform-origin:0 0">
+      <circle r="${R}" fill="none" stroke="#111827" stroke-width="${pneu}"/>
+      ${vtt ? Array.from({ length: 16 }, (_, i) => `<rect x="-2" y="${-R - 5}" width="4" height="4" fill="#111827" transform="rotate(${i * 22.5})"/>`).join('') : ''}
+      ${[0, 30, 60, 90, 120, 150].map(d => `<line x1="0" y1="${-R + 3}" x2="0" y2="${R - 3}" stroke="#9ca3af" stroke-width="1" transform="rotate(${d})"/>`).join('')}
+      <circle r="3.5" fill="#d1d5db"/></g></g>`;
+    const tube = (p, q, w = 6, col = c) => `<path d="M${p[0]} ${p[1]} L${q[0]} ${q[1]}" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/>`;
+    const A = [xA, yR], B = [xB, yR], BB = [xBB, yR];
+    const cadre = tube(A, BB) + tube(BB, S) + tube(S, A, 5) + tube(S, H) + tube(BB, H, 7) + tube(H, B, 5, '#9ca3af')
+      + (c2 ? tube([S[0] + 10, S[1] + 1], [H[0] - 10, H[1] + 1], 3, c2) : '');
+    const selle = `<path d="M${S[0] - 4} ${S[1]} L${S[0] - 6} ${S[1] - 9}" stroke="#4b5563" stroke-width="3"/><path d="M${S[0] - 18} ${S[1] - 11} Q${S[0] - 6} ${S[1] - 15} ${S[0] + 6} ${S[1] - 10} Q${S[0] - 6} ${S[1] - 6} ${S[0] - 18} ${S[1] - 11} Z" fill="#111827"/>`;
+    const gx = H[0] - 4, gy = H[1] - 14;
+    const guidon = `<path d="M${H[0]} ${H[1]} L${gx} ${gy}" stroke="#4b5563" stroke-width="4"/>` + (course
+      ? `<path d="M${gx - 2} ${gy} L${gx + 10} ${gy} Q${gx + 18} ${gy + 2} ${gx + 14} ${gy + 12} L${gx + 8} ${gy + 12}" stroke="#111827" stroke-width="4" fill="none" stroke-linecap="round"/>`
+      : `<path d="M${gx - 8} ${gy - 2} L${gx + 10} ${gy + 2}" stroke="#111827" stroke-width="5" stroke-linecap="round"/>`);
+    const pedalier = `<circle cx="${xBB}" cy="${yR}" r="8" fill="none" stroke="#6b7280" stroke-width="3"/><path d="M${xBB} ${yR} L${xBB + 8} ${yR + 12}" stroke="#374151" stroke-width="4" stroke-linecap="round"/><rect x="${xBB + 3}" y="${yR + 11}" width="12" height="4" rx="1" fill="#111827"/>`;
+    const extra = {
+      sonnette: `<circle cx="${gx + 4}" cy="${gy - 4}" r="4" fill="#facc15" stroke="#a16207"/>`,
+      panier: `<path d="M${H[0] + 2} ${H[1] - 8} L${H[0] + 30} ${H[1] - 8} L${H[0] + 26} ${H[1] + 14} L${H[0] + 6} ${H[1] + 14} Z" fill="#d6a461" stroke="#92400e" stroke-width="2"/><path d="M${H[0] + 8} ${H[1] - 8} l2 22 M${H[0] + 16} ${H[1] - 8} v22 M${H[0] + 24} ${H[1] - 8} l-2 22" stroke="#92400e" stroke-width="1.2"/><circle cx="${H[0] + 16}" cy="${H[1] - 12}" r="5" fill="#ef4444"/>`,
+      rubans: `<path d="M${gx - 8} ${gy - 2} q-6 10 -2 20 M${gx - 8} ${gy - 2} q-12 6 -14 18" stroke="#ec4899" stroke-width="2.5" fill="none"/><path d="M${gx - 8} ${gy - 2} q-2 12 4 18" stroke="#38bdf8" stroke-width="2.5" fill="none"/>`,
+      lumieres: `<path d="M${H[0] + 4} ${H[1] - 2} L${H[0] + 60} ${H[1] - 18} L${H[0] + 60} ${H[1] + 16} Z" fill="#fef08a" opacity=".5"/><circle cx="${H[0] + 4}" cy="${H[1] - 2}" r="5" fill="#facc15" stroke="#a16207"/><rect x="${S[0] - 22}" y="${S[1] + 6}" width="7" height="5" rx="1" fill="#ef4444"/>`,
+      sacoche: `<path d="M${xA - 2} ${S[1] + 6} L${S[0] - 8} ${S[1] + 6}" stroke="#4b5563" stroke-width="3"/><rect x="${xA - 6}" y="${S[1] + 8}" width="30" height="24" rx="5" fill="#a16207" stroke="#713f12" stroke-width="2"/>`,
+      fanion: `<path d="M${xA} ${yR} L${xA - 10} ${yR - 110}" stroke="#4b5563" stroke-width="2"/><path d="M${xA - 10} ${yR - 110} L${xA + 18} ${yR - 100} L${xA - 8} ${yR - 90} Z" fill="#f97316"/>`
+    }[a] || '';
+    return `<svg viewBox="0 0 220 180" class="rider-svg" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="110" cy="${yR + R + 4}" rx="90" ry="5" fill="rgba(0,0,0,.18)"/>
+      ${a === 'fanion' || a === 'sacoche' ? extra : ''}
+      ${roue(xA)}${roue(xB)}${cadre}${pedalier}${selle}${guidon}
+      ${a !== 'fanion' && a !== 'sacoche' ? extra : ''}
+    </svg>`;
+  },
+  autocollants: [
+    { id: 've1', e: '🚲', n: 'Vélo', r: 1 }, { id: 've2', e: '🔔', n: 'Sonnette', r: 1 }, { id: 've3', e: '⛑️', n: 'Casque', r: 1 },
+    { id: 've4', e: '🚦', n: 'Feu rouge', r: 1 }, { id: 've5', e: '🚵', n: 'VTT', r: 2 }, { id: 've6', e: '🏔️', n: 'Col de montagne', r: 2 },
+    { id: 've7', e: '🟡', n: 'Maillot jaune', r: 3 }
+  ]
+};
+
+/* =========================================================
+   9. LA PEINTURE (le tableau grandit ; la jauge = l'inspiration)
+   ========================================================= */
+UNIVERS.peinture = {
+  nom: 'la peinture',
+  objet: 'ton atelier',
+  boutique: { titre: 'L\'Atelier', icone: '🎨' },
+  jeux: { mots: 'La Palette des mots', tables: 'La Fresque des tables', problemes: 'Les Enquêtes', parcours: 'Le Permis de la route' },
+  emojiCourse: '🖌️🎨🖼️',
+  depart: '🖌️ À vos pinceaux… Peignez !',
+  scene: 'atelier',
+  decor: '🖼️      🌻         🖌️        🖼️       🌷',
+  jauge: (v, m) => ({ court: '🎨 Ton inspiration : ', val: `${v}`, phrase: `Avec tes ${m.court}, ton inspiration monte à ${v} !` }),
+  onglets: [
+    { id: 'model', label: '🖌️ Matériel', items: [
+      { id: 'crayons', name: 'Crayons de couleur', court: 'crayons de couleur', n: 0, price: 0, lvl: 1, bonus: 0 },
+      { id: 'feutres', name: 'Feutres', court: 'feutres', n: 1, price: 80, lvl: 2, bonus: 2 },
+      { id: 'aquarelle', name: 'Boîte d\'aquarelle', court: 'aquarelles', n: 2, price: 180, lvl: 4, bonus: 4 },
+      { id: 'acrylique', name: 'Peinture acrylique', court: 'pots de peinture', n: 3, price: 320, lvl: 6, bonus: 7 },
+      { id: 'or', name: 'Pinceaux d\'or', court: 'pinceaux d\'or', n: 4, price: 600, lvl: 9, bonus: 10 }] },
+    { id: 'color', label: '🥼 Blouse', items: [
+      { id: 'blanche', name: 'Blouse blanche', c: '#f8fafc', price: 0 },
+      { id: 'bleue', name: 'Blouse bleue', c: '#3b82f6', price: 30 },
+      { id: 'jaune', name: 'Blouse jaune', c: '#facc15', price: 30 },
+      { id: 'verte', name: 'Blouse verte', c: '#22c55e', price: 30 },
+      { id: 'rose', name: 'Blouse rose', c: '#f472b6', price: 40 },
+      { id: 'noire', name: 'Blouse noire', c: '#1f2937', price: 60 }] },
+    { id: 'acc', label: '🎨 Style', items: [
+      { id: 'aucun', name: 'Tout simple', price: 0 },
+      { id: 'beret', name: 'Béret d\'artiste', price: 30 },
+      { id: 'palette', name: 'Palette', price: 40 },
+      { id: 'taches', name: 'Taches de peinture', price: 40 },
+      { id: 'lunettes', name: 'Lunettes de star', price: 70 },
+      { id: 'medaille', name: 'Médaille du concours', price: 100 },
+      { id: 'couronne', name: 'Couronne d\'artiste', price: 120 }] }
+  ],
+  dessin(o) {
+    const cx = 56, t = 14, hy = t + 20, a = o.acc.id, n = o.model.n || 0;
+    const bras = { L: `M${cx - 15} ${t + 44} L${cx - 26} ${t + 80}`, R: `M${cx + 15} ${t + 44} Q${cx + 34} ${t + 52} ${cx + 48} ${t + 40}`, hL: [cx - 27, t + 83], hR: [cx + 50, t + 38] };
+    const pinceau = `<path d="M${cx + 48} ${t + 42} L${cx + 66} ${t + 24}" stroke="#92400e" stroke-width="3" stroke-linecap="round"/><circle cx="${cx + 67}" cy="${t + 23}" r="3" fill="#ef4444"/>`;
+    const X = 128, Y = 24, W = 70, Hh = 56;
+    const tableau = `<rect x="${X}" y="${Y}" width="${W}" height="${Hh}" fill="${n >= 2 ? '#bae6fd' : '#fff'}" stroke="${n >= 4 ? '#d4a017' : '#92400e'}" stroke-width="${n >= 4 ? 5 : 3}"/>
+      <circle cx="${X + W - 14}" cy="${Y + 14}" r="8" fill="#facc15"/>
+      ${n >= 1 ? `<path d="M${X} ${Y + Hh} Q${X + 20} ${Y + 28} ${X + 40} ${Y + 40} Q${X + 56} ${Y + 30} ${X + W} ${Y + 38} L${X + W} ${Y + Hh} Z" fill="#4ade80"/>` : `<path d="M${X + 8} ${Y + 44} q12 -10 24 0 q12 10 24 0" stroke="#22c55e" stroke-width="3" fill="none"/>`}
+      ${n >= 3 ? `<rect x="${X + 14}" y="${Y + 30}" width="16" height="14" fill="#f97316"/><path d="M${X + 12} ${Y + 30} L${X + 22} ${Y + 22} L${X + 32} ${Y + 30} Z" fill="#b91c1c"/>` : ''}
+      ${n >= 4 ? `<path d="M${X + 8} ${Y + 34} A22 22 0 0 1 ${X + 52} ${Y + 34}" stroke="#ef4444" stroke-width="3" fill="none"/><path d="M${X + 12} ${Y + 34} A18 18 0 0 1 ${X + 48} ${Y + 34}" stroke="#facc15" stroke-width="3" fill="none"/><path d="M${X + 16} ${Y + 34} A14 14 0 0 1 ${X + 44} ${Y + 34}" stroke="#3b82f6" stroke-width="3" fill="none"/>` : ''}`;
+    const chevalet = `<path d="M${X + W / 2} ${Y - 8} L${X + 6} 168 M${X + W / 2} ${Y - 8} L${X + W - 6} 168 M${X + W / 2} ${Y - 8} L${X + W / 2} 168" stroke="#a16207" stroke-width="4" stroke-linecap="round"/><rect x="${X - 4}" y="${Y + Hh}" width="${W + 8}" height="5" fill="#a16207"/>`;
+    const palette = a === 'palette' ? `<ellipse cx="${cx - 30}" cy="${t + 86}" rx="15" ry="10" fill="#e7c08a" stroke="#92400e" stroke-width="1.5"/>${['#ef4444', '#3b82f6', '#facc15', '#22c55e'].map((col, i) => `<circle cx="${cx - 38 + i * 5}" cy="${t + 83 + (i % 2) * 4}" r="2.5" fill="${col}"/>`).join('')}` : '';
+    const taches = a === 'taches' ? [['#ef4444', -8, 50], ['#3b82f6', 6, 60], ['#facc15', -4, 70], ['#22c55e', 9, 46]].map(([col, dx, dy]) => `<circle cx="${cx + dx}" cy="${t + dy}" r="3" fill="${col}"/>`).join('') : '';
+    const beret = a === 'beret' ? `<ellipse cx="${cx + 2}" cy="${hy - 15}" rx="19" ry="6" fill="#1f2937"/><circle cx="${cx + 2}" cy="${hy - 21}" r="2.5" fill="#1f2937"/>` : '';
+    const head = (a === 'beret' || a === 'palette' || a === 'taches') ? '' : accEnfant(a, cx, t);
+    return `<svg viewBox="0 0 220 180" class="rider-svg" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="110" cy="172" rx="90" ry="6" fill="rgba(0,0,0,.18)"/>
+      ${chevalet}${tableau}
+      ${dessinEnfant({ cx, top: t, shirt: o.color.c, shorts: '#1f2937', socks: '#f8fafc', shoes: '#111827', bras, head: head + beret })}
+      ${taches}${pinceau}${palette}
+    </svg>`;
+  },
+  autocollants: [
+    { id: 'pe1', e: '🎨', n: 'Palette', r: 1 }, { id: 'pe2', e: '🖌️', n: 'Pinceau', r: 1 }, { id: 'pe3', e: '🖍️', n: 'Crayon', r: 1 },
+    { id: 'pe4', e: '🌈', n: 'Arc-en-ciel', r: 1 }, { id: 'pe5', e: '🖼️', n: 'Tableau', r: 2 }, { id: 'pe6', e: '🌻', n: 'Tournesols', r: 2 },
+    { id: 'pe7', e: '🏛️', n: 'Musée', r: 3 }
+  ]
+};
+
+/* =========================================================
+   10. LA MUSIQUE (l'instrument ; la jauge = le public)
+   ========================================================= */
+UNIVERS.musique = {
+  nom: 'la musique',
+  objet: 'ton instrument',
+  boutique: { titre: 'Le Studio', icone: '🎧' },
+  jeux: { mots: 'La Chanson des mots', tables: 'Le Rythme des tables', problemes: 'Les Enquêtes', parcours: 'Le Permis de la route' },
+  emojiCourse: '🎸🎶🔥',
+  depart: '🥁 Un, deux, trois, quatre !',
+  scene: 'spectacle',
+  decor: '🎵     ✨       🎶        🎤       🎵',
+  jauge: (v, m) => ({ court: `🎵 ${m.name} · public : `, val: `${v * 10} fans`, phrase: `Ton public monte à ${v * 10} fans !` }),
+  onglets: [
+    { id: 'model', label: '🎸 Instrument', items: [
+      { id: 'flute', name: 'Flûte', type: 'flute', price: 0, lvl: 1, bonus: 0 },
+      { id: 'ukulele', name: 'Ukulélé', type: 'ukulele', price: 80, lvl: 2, bonus: 2 },
+      { id: 'guitare', name: 'Guitare', type: 'guitare', price: 180, lvl: 4, bonus: 4 },
+      { id: 'batterie', name: 'Batterie', type: 'batterie', price: 300, lvl: 6, bonus: 6 },
+      { id: 'electrique', name: 'Guitare électrique', type: 'electrique', price: 450, lvl: 8, bonus: 8 },
+      { id: 'micro', name: 'Micro de star', type: 'micro', price: 600, lvl: 9, bonus: 10 }] },
+    { id: 'color', label: '🎨 Couleur', items: [
+      { id: 'bois', name: 'Bois naturel', c: '#b45309', price: 0 },
+      { id: 'rouge', name: 'Rouge', c: '#dc2626', price: 30 },
+      { id: 'bleu', name: 'Bleu', c: '#2563eb', price: 30 },
+      { id: 'noir', name: 'Noir', c: '#111827', price: 50 },
+      { id: 'blanc', name: 'Blanc', c: '#f8fafc', price: 50 },
+      { id: 'violet', name: 'Violet', c: '#7c3aed', price: 60 },
+      { id: 'or', name: 'Or', c: '#d4a017', price: 120 }] },
+    { id: 'acc', label: '🎧 Style', items: [
+      { id: 'aucun', name: 'Tout simple', price: 0 },
+      { id: 'casqueAudio', name: 'Casque audio', price: 30 },
+      { id: 'casquette', name: 'Casquette', price: 30 },
+      { id: 'bandeau', name: 'Bandeau', price: 30 },
+      { id: 'lunettes', name: 'Lunettes de star', price: 70 },
+      { id: 'notes', name: 'Notes qui volent', price: 80 },
+      { id: 'medaille', name: 'Disque d\'or', price: 100 },
+      { id: 'couronne', name: 'Couronne de star', price: 120 }] }
+  ],
+  dessin(o) {
+    const cx = 84, t = 14, hy = t + 20, a = o.acc.id, k = o.model.type, c = o.color.c;
+    const AP = (PROFIL.enfant && PROFIL.enfant.apparence) || {};
+    const skin = AP.peau || '#e8b98f', shirt = AP.tshirt || '#1f2937';
+    const main = (p) => `<circle cx="${p[0]}" cy="${p[1]}" r="5.5" fill="${skin}"/>`;
+    let bras = null, instr = '', mains = [], arriere = '';
+    if (k === 'flute') {
+      bras = { L: `M${cx - 15} ${t + 44} Q${cx - 8} ${t + 62} ${cx + 12} ${t + 42}`, R: `M${cx + 15} ${t + 44} Q${cx + 30} ${t + 60} ${cx + 24} ${t + 58}`, hL: [cx + 12, t + 42], hR: [cx + 24, t + 58] };
+      instr = `<path d="M${cx + 2} ${hy + 9} L${cx + 36} ${t + 74}" stroke="${c}" stroke-width="5" stroke-linecap="round"/>${[0.45, 0.6, 0.75].map(f => `<circle cx="${cx + 2 + 34 * f}" cy="${hy + 9 + (t + 74 - hy - 9) * f}" r="1.3" fill="#111827"/>`).join('')}`;
+      mains = [bras.hL, bras.hR];
+    } else if (k === 'ukulele' || k === 'guitare' || k === 'electrique') {
+      const s = k === 'ukulele' ? .75 : 1;
+      bras = { L: `M${cx - 15} ${t + 44} Q${cx - 12} ${t + 70} ${cx + 2} ${t + 68}`, R: `M${cx + 15} ${t + 44} Q${cx + 30} ${t + 54} ${cx + 38} ${t + 46}`, hL: [cx + 2, t + 68], hR: [cx + 38, t + 46] };
+      const gx = cx - 2, gy = t + 70;
+      instr = k === 'electrique'
+        ? `<path d="M${gx - 16} ${gy + 4} Q${gx - 20} ${gy - 14} ${gx - 4} ${gy - 12} L${gx + 8} ${gy - 20} L${gx + 12} ${gy - 12} Q${gx + 18} ${gy + 12} ${gx} ${gy + 14} Q${gx - 12} ${gy + 16} ${gx - 16} ${gy + 4} Z" fill="${c}" stroke="#111827" stroke-width="2"/><rect x="${gx - 8}" y="${gy - 4}" width="10" height="4" fill="#f8fafc"/><rect x="${gx - 4}" y="${gy + 3}" width="10" height="4" fill="#f8fafc"/>
+           <path d="M${gx + 6} ${gy - 10} L${gx + 44} ${gy - 30}" stroke="#78350f" stroke-width="5" stroke-linecap="round"/><path d="M${gx + 18} 168 Q${gx + 60} 168 ${gx + 76} ${gy}" stroke="#111827" stroke-width="2" fill="none"/>`
+        : `<circle cx="${gx - 4 * s}" cy="${gy + 4 * s}" r="${13 * s}" fill="${c}" stroke="#111827" stroke-width="1.5"/><circle cx="${gx + 7 * s}" cy="${gy - 4 * s}" r="${10 * s}" fill="${c}" stroke="#111827" stroke-width="1.5"/><circle cx="${gx + 2 * s}" cy="${gy}" r="${4 * s}" fill="#1f2937"/>
+           <path d="M${gx + 10 * s} ${gy - 6 * s} L${gx + 44 * s} ${gy - 26 * s}" stroke="#78350f" stroke-width="5" stroke-linecap="round"/><rect x="${gx + 42 * s}" y="${gy - 32 * s}" width="8" height="9" rx="2" fill="#78350f" transform="rotate(-30 ${gx + 46 * s} ${gy - 28 * s})"/>`;
+      if (k === 'electrique') arriere = `<rect x="168" y="124" width="40" height="44" rx="4" fill="#111827"/><rect x="174" y="132" width="28" height="28" rx="3" fill="#374151"/><circle cx="188" cy="146" r="10" fill="#1f2937"/>`;
+      mains = [bras.hL, bras.hR];
+    } else if (k === 'batterie') {
+      bras = { L: `M${cx - 15} ${t + 44} Q${cx - 32} ${t + 70} ${cx - 22} ${t + 92}`, R: `M${cx + 15} ${t + 44} Q${cx + 32} ${t + 70} ${cx + 22} ${t + 92}`, hL: [cx - 22, t + 94], hR: [cx + 22, t + 94] };
+      instr = `<path d="M${cx - 22} ${t + 94} L${cx - 44} ${t + 104} M${cx + 22} ${t + 94} L${cx + 46} ${t + 100}" stroke="#d6a461" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="${cx}" cy="140" r="27" fill="${c}" stroke="#111827" stroke-width="2"/><circle cx="${cx}" cy="140" r="19" fill="#f8fafc"/><text x="${cx}" y="145" font-size="12" font-weight="700" text-anchor="middle" fill="#111827" font-family="Arial">♪</text>
+        <ellipse cx="${cx - 40}" cy="${t + 108}" rx="16" ry="6" fill="#e5e7eb" stroke="#111827" stroke-width="1.5"/><rect x="${cx - 56}" y="${t + 108}" width="32" height="14" fill="${c}" stroke="#111827" stroke-width="1.5"/>
+        <ellipse cx="${cx + 42}" cy="${t + 102}" rx="14" ry="5" fill="#e5e7eb" stroke="#111827" stroke-width="1.5"/><rect x="${cx + 28}" y="${t + 102}" width="28" height="12" fill="${c}" stroke="#111827" stroke-width="1.5"/>
+        <path d="M${cx + 62} ${t + 80} L${cx + 62} 166" stroke="#6b7280" stroke-width="2"/><ellipse cx="${cx + 62}" cy="${t + 80}" rx="18" ry="3" fill="#facc15" stroke="#a16207"/>`;
+      mains = [bras.hL, bras.hR];
+    } else {
+      bras = { L: `M${cx - 15} ${t + 44} Q${cx - 34} ${t + 30} ${cx - 28} ${t + 8}`, R: `M${cx + 15} ${t + 44} Q${cx + 24} ${t + 62} ${cx + 9} ${t + 40}`, hL: [cx - 27, t + 5], hR: [cx + 9, t + 40] };
+      instr = `<rect x="${cx + 6}" y="${t + 36}" width="6" height="16" rx="2" fill="#374151"/><circle cx="${cx + 9}" cy="${t + 32}" r="6" fill="${c === '#f8fafc' ? '#9ca3af' : c}" stroke="#111827" stroke-width="1.5"/>`;
+      mains = [bras.hR];
+    }
+    const casque = a === 'casqueAudio' ? `<path d="M${cx - 18} ${hy + 2} Q${cx - 20} ${hy - 24} ${cx} ${hy - 24} Q${cx + 20} ${hy - 24} ${cx + 18} ${hy + 2}" stroke="#111827" stroke-width="4" fill="none"/><rect x="${cx - 23}" y="${hy - 4}" width="8" height="13" rx="3" fill="${c}"/><rect x="${cx + 15}" y="${hy - 4}" width="8" height="13" rx="3" fill="${c}"/>` : '';
+    const notes = a === 'notes' ? `<text x="${cx + 30}" y="${t + 20}" font-size="18" fill="#facc15">♪</text><text x="${cx + 52}" y="${t + 6}" font-size="16" fill="#f472b6">♫</text><text x="${cx - 52}" y="${t + 30}" font-size="16" fill="#38bdf8">♪</text>` : '';
+    const head = (a === 'casqueAudio' || a === 'notes') ? '' : accEnfant(a, cx, t);
+    return `<svg viewBox="0 0 220 180" class="rider-svg" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="110" cy="172" rx="90" ry="6" fill="rgba(0,0,0,.25)"/>
+      ${arriere}
+      ${dessinEnfant({ cx, top: t, shirt, shorts: '#1f2937', socks: '#111827', shoes: '#111827', bras, head: head + casque })}
+      ${instr}${mains.map(main).join('')}${notes}
+    </svg>`;
+  },
+  autocollants: [
+    { id: 'mu1', e: '🎵', n: 'Note', r: 1 }, { id: 'mu2', e: '🎸', n: 'Guitare', r: 1 }, { id: 'mu3', e: '🥁', n: 'Batterie', r: 1 },
+    { id: 'mu4', e: '🎹', n: 'Piano', r: 1 }, { id: 'mu5', e: '🎤', n: 'Micro', r: 2 }, { id: 'mu6', e: '🎧', n: 'Casque', r: 2 },
+    { id: 'mu7', e: '💿', n: 'Disque d\'or', r: 3 }
   ]
 };

@@ -47,9 +47,27 @@
     /* révision d'un ancien devoir : moitié moins d'éclairs (la semaine en cours reste la priorité) */
     if (isOld()) { eclairs = Math.max(5, Math.round(eclairs / 2)); lines = ['📦 Révision', ...lines]; }
     Z.endScreen(shell, { medal: '📚', title: isOld() ? 'Révision terminée !' : 'Exercice terminé !', eclairs, xp: eclairs, lines, kind: 'devoirs', detail: D().id + ':' + it.id, again: back, againLabel: '📚 Mes devoirs' });
+    if (Z.adapte('hpi') && it.defi) {
+      const t = '🧠 Défi bonus : ' + it.defi;
+      const rep = it.defiReponse ? h('div', { class: 'card rule', style: { display: 'none' } }, it.defiReponse, Z.ear(it.defiReponse)) : null;
+      shell.root.append(h('div', { class: 'card' }, h('span', null, t), Z.ear(t)), rep,
+        rep ? h('button', { class: 'btn ghost wide', onclick: (e) => { Z.sfx.tap(); rep.style.display = ''; e.currentTarget.remove(); } }, '👀 Voir une réponse possible') : null);
+    }
+    if (Z.adapte('tdah') && Z.devoirsLeft() > 0 && !isOld()) shell.root.append(pauseBtn());
+  }
+  /* TDAH : une vraie pause, courte et minutée, avant l'exercice suivant */
+  function pauseBtn() {
+    const b = h('button', { class: 'btn gold wide', onclick: () => {
+      Z.sfx.tap(); let n = 120;
+      const show = () => { b.textContent = `☕ Pause : ${Math.floor(n / 60)} min ${String(n % 60).padStart(2, '0')} s`; };
+      show(); b.disabled = true; say('Petite pause de deux minutes. Lève-toi, bois un verre d’eau, étire-toi. Je te préviens quand c’est fini.');
+      const iv = setInterval(() => { n--; if (!document.body.contains(b)) return clearInterval(iv); show();
+        if (n <= 0) { clearInterval(iv); Z.sfx.good(); b.textContent = '✅ Pause finie ! On continue ?'; b.disabled = false; b.onclick = back; say('La pause est finie. On continue ?'); } }, 1000);
+    } }, '☕ Faire une pause de 2 minutes');
+    return b;
   }
 
-  const ICO = { verbes: '✏️', sujet: '🟥', mathador: '🔢', poesie: '📜' };
+  const ICO = { verbes: '✏️', sujet: '🟥', mathador: '🔢', poesie: '📜', activite: '📝' };
   const itemBtn = (it, s, wid) => h('button', { class: 'devoir' + (s.done[it.id] ? ' fait' : ''), onclick: () => { Z.sfx.vroum(); Z.go('devoir', it.id, wid); } },
     h('span', { class: 'd-ico' }, s.done[it.id] ? '✅' : ICO[it.type]),
     h('span', { class: 'grow' }, it.titre, h('small', null, it.pour)),
@@ -74,11 +92,16 @@
     const left = items.filter(i => !s.done[i.id]).length;
     const hello = Z.state.guideDevoirsMet ? '' : `Moi c’est ${Z.guide('devoirs').nom}. Je t’aide pour tes devoirs : doucement, mais sûrement ! `;
     if (!Z.state.guideDevoirsMet) { Z.state.guideDevoirsMet = true; Z.save(); }
-    const t = left ? `Salut ${Z.nomPour('devoirs')} ! ${hello}Voici tes devoirs. Il en reste ${left}. Choisis par où tu commences !` : `${hello}Bravo ${Z.nomPour('devoirs')}, tous tes devoirs sont faits ! Tu peux imprimer la feuille pour ${PROFIL.appli.ecole || 'l’école'}.`;
+    const t = left ? `Salut ${Z.nomPour('devoirs')} ! ${hello}Voici tes devoirs. Il en reste ${left}. ${Z.adapte('tsa') ? 'On les fait dans l’ordre, en commençant par le premier.' : 'Choisis par où tu commences !'}` : `${hello}Bravo ${Z.nomPour('devoirs')}, tous tes devoirs sont faits ! Tu peux imprimer la feuille pour ${PROFIL.appli.ecole || 'l’école'}.`;
+    const faits = items.length - left, prochain = items.find(i => !s.done[i.id]);
+    const barre = (Z.adapte('tdah') || Z.adapte('tsa')) && items.length ? h('div', { class: 'card' },
+      h('b', null, `${faits} sur ${items.length} fait${faits > 1 ? 's' : ''}`),
+      h('div', { class: 'bar devoirs-bar' }, h('i', { style: { width: Math.round(faits / items.length * 100) + '%' } }))) : null;
+    const ordre = Z.adapte('tsa') && prochain ? Z.guideSays(`On fait les devoirs dans l’ordre. Maintenant : ${prochain.titre}.`) : null;
     shell.root.append(
       h('h2', null, '📚 Mes devoirs'),
-      Z.guideSays(t),
-      ...items.map(it => itemBtn(it, s)),
+      Z.guideSays(t), barre, ordre,
+      ...items.map(it => { const b = itemBtn(it, s); if ((Z.adapte('tdah') || Z.adapte('tsa')) && it === prochain) b.classList.add('prochain'); return b; }),
       h('button', { class: 'btn ghost wide', onclick: printSheet }, '🖨️ Imprimer pour ' + (PROFIL.appli.ecole || 'l’école')),
       archives().length ? h('button', { class: 'btn purple wide', onclick: () => { Z.sfx.tap(); Z.go('archives'); } }, `📦 Mes anciens devoirs (${archives().length})`) : null);
   };
@@ -105,8 +128,35 @@
     week = findWeek(wid);
     const it = D().items.find(i => i.id === id);
     const shell = Z.shell({ title: it.titre });
-    ({ verbes, sujet, mathador, poesie })[it.type](shell, it);
+    ({ verbes, sujet, mathador, poesie, activite })[it.type](shell, it);
+    /* TSA : le plan de l'exercice, toujours le même, affiché avant de commencer */
+    if (Z.adapte('tsa')) {
+      const n = it.phrases ? it.phrases.length : it.questions ? it.questions.length : it.items ? it.items.length : null;
+      const plan = ['Je lis (ou j’écoute) la consigne.', n ? `Je réponds aux ${n} questions, une par une.` : 'Je fais l’exercice, étape par étape.', 'Je vois mon résultat. Ensuite, c’est fini.'];
+      const t = 'Ce que je vais faire : ' + plan.map((x, i) => (i + 1) + '. ' + x).join(' ');
+      const h2 = shell.root.querySelector('h2');
+      const card = h('div', { class: 'card plan-tsa' }, h('b', null, '🗺️ Ce que je vais faire'), h('ol', null, plan.map(x => h('li', null, x))), Z.ear(t));
+      if (h2) h2.after(card); else shell.root.prepend(card);
+    }
+    /* HPI : pourquoi on fait cet exercice */
+    if (Z.adapte('hpi') && it.pourquoi) {
+      const h2 = shell.root.querySelector('h2');
+      const card = h('div', { class: 'card rule' }, h('b', null, '💡 Pourquoi on fait ça ? '), it.pourquoi, Z.ear(it.pourquoi));
+      if (h2) h2.after(card); else shell.root.prepend(card);
+    }
   };
+
+  /* ---------- EXERCICE LIBRE : un des moteurs (qcm, trous, paires, ordre, cartes, calcul, schema) ---------- */
+  function activite(shell, it) {
+    shell.setSteps(0, 0);
+    const t = it.consigne || Z.consigneDe(it.moteur) || 'C’est parti !';
+    shell.root.append(h('h2', null, '📝 ' + it.titre), Z.guideSays(t),
+      it.rappel ? h('div', { class: 'card rule' }, h('b', null, '📌 À retenir : '), it.rappel, Z.ear(it.rappel)) : null,
+      h('button', { class: 'btn green wide', onclick: () => { Z.sfx.tap(); Z.lancerMoteur(shell, it, ({ firstTry, total, lines }) => {
+        const s = store(); s.res[it.id] = { firstTry, total };
+        reward(shell, it, 10 + firstTry * 2, [total ? `${firstTry} réussite(s) du premier coup sur ${total}` : '', ...lines].filter(Boolean));
+      }); } }, '▶️ C’est parti !'));
+  }
 
   /* ---------- VERBES À ACCORDER ---------- */
   const RULE = 'Je cherche le sujet : qui fait l’action ? Avec il, elle, on : la fin est t. Avec ils, elles : la fin est ent. Avec je, tu : la fin est s.';
@@ -545,6 +595,9 @@
             const words = parseSujet(line), m = res && res[n];
             return h('p', null, String.fromCharCode(97 + n) + '. ', words.flatMap((w, i) => [h('span', { class: m && m[i] === 'V' ? 'pv' : m && m[i] === 'S' ? 'ps' : '' }, w.w), ' ']));
           })));
+      } else if (it.type === 'activite') {
+        blocks.push(h('section', null, h('h3', null, it.titre + (it.consigne ? ' : ' + it.consigne : '')),
+          h('p', null, res ? `Fait sur l’appli : ${res.firstTry} réussite(s) du premier coup sur ${res.total}.` : '(pas encore fait)')));
       } else if (it.type === 'mathador') {
         blocks.push(h('section', null, h('h3', null, `Mathador : ${it.nombres.join(' / ')} → ${it.cible}`),
           res ? res.log.map(l => h('p', null, l)) : h('p', null, '(pas encore fait)'),

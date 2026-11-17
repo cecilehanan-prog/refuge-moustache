@@ -11,6 +11,8 @@ document.title = PROFIL.appli.nom;
 Z.appliquerAides = function () {
   const S = Z.state.settings, b = document.body, r = document.documentElement.style;
   b.classList.toggle('ado', Z.ADO);
+  b.classList.toggle('lycee', Z.TON === 'lycee');
+  ['dys', 'tdah', 'tsa', 'hpi'].forEach(x => b.classList.toggle('adapt-' + x, Z.adapte(x)));
   b.classList.toggle('sans-guides', !Z.GUIDES);
   b.classList.toggle('sans-syllabes', S.syllabes === false);
   b.classList.toggle('serre', S.espacement === false);
@@ -118,6 +120,13 @@ Z.screens.home = function () {
     Z.svg(Z.hero(), 'rider'),
     Z.GUIDES ? Z.svg(Z.art.cat({ who: 'accueil' }), 'cat') : null);
 
+  /* Collège : une citation rigolote ; lycée : une blague. Une par jour. */
+  const motJour = (() => {
+    const L = Z.TON === 'college' ? ZDATA.citations : Z.TON === 'lycee' ? ZDATA.blagues : null;
+    if (!L || !L.length || (PROFIL.style && PROFIL.style.motDuJour === false)) return null;
+    const t = L[Z.dayNum() % L.length];
+    return h('div', { class: 'card mot-jour' }, h('b', null, Z.TON === 'lycee' ? '😏 La blague du jour' : '💬 La phrase du jour'), h('div', null, t), Z.ear(t));
+  })();
   const ready = d.games >= goal && !d.chest;
   const mission = h('div', { class: 'mission' },
     h('div', { class: 'chest' + (ready ? ' ready' : '') }, d.chest ? '🎁' : '🧰'),
@@ -141,7 +150,7 @@ Z.screens.home = function () {
 
   const nav = navBar('home');
 
-  app.append(top, hello, scene, mission, worlds, nav);
+  app.append(top, hello, scene, mission, motJour || "", worlds, nav);
 
   if (!st.welcomed) {
     st.welcomed = true; Z.save();

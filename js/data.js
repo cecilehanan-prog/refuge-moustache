@@ -159,6 +159,24 @@ ZDATA.words = [
     hint: "Préhistoire, c'est pré et histoire : avant l'histoire. Le H d'histoire est muet." },
   { th: 'dinosaures', id: 'volcan', s: 'vol-c[an]', e: '🌋', ph: "Le volcan crache de la lave.", hint: "Volcan finit par A N." },
 
+  // --- Danse, vélo, peinture, musique ---
+  { th: 'danse', id: 'danse', s: 'd[an]-[s]e', e: '💃', ph: "J'adore la danse.", hint: "Danse : A N, puis S E." },
+  { th: 'danse', id: 'chausson', s: '[ch][au]-[ss][on]', e: '🩰', ph: "J'enfile mes chaussons roses.", hint: "Chausson : A U fait o, deux S, puis O N." },
+  { th: 'danse', id: 'pirouette', s: 'pi-rou-e-[tt]e', e: '🌀', ph: "Je fais une pirouette sur la pointe des pieds.", hint: "Pirouette : O U, puis deux T à la fin." },
+  { th: 'danse', id: 'spectacle', s: 'spec-ta-cl(e)', e: '🎭', ph: "Le spectacle commence ce soir.", hint: "Spectacle : S P E C, puis T A, puis C L E." },
+  { th: 'velo', id: 'velo', s: 'v[é]-lo', e: '🚲', ph: "Je monte sur mon vélo.", hint: "Vélo : un É avec un accent aigu." },
+  { th: 'velo', id: 'pedale', s: 'p[é]-da-l(e)', e: '🦶', ph: "Je pousse fort sur la pédale.", hint: "Pédale : É, puis un E muet à la fin." },
+  { th: 'velo', id: 'guidon', s: '[gu]i-d[on]', e: '🚴', ph: "Je tiens bien le guidon.", hint: "Guidon : G U I fait gui, puis O N." },
+  { th: 'velo', id: 'freiner', s: 'fr[ei]-n[er]', e: '🛑', ph: "Je dois freiner avant le virage.", hint: "Freiner : E I fait è, et E R à la fin." },
+  { th: 'peinture', id: 'peinture', s: 'p[ein]-tu-r(e)', e: '🎨', ph: "La peinture est encore fraîche.", hint: "Peinture : E I N fait in." },
+  { th: 'peinture', id: 'pinceau', s: 'p[in]-[c][eau]', e: '🖌️', ph: "Je trempe mon pinceau dans le bleu.", hint: "Pinceau : I N, puis C E A U : le C fait s." },
+  { th: 'peinture', id: 'couleur', s: 'cou-l[eu]r', e: '🌈', ph: "Ma couleur préférée, c'est le vert.", hint: "Couleur : O U, puis E U R." },
+  { th: 'peinture', id: 'tableau', s: 'ta-bl[eau]', e: '🖼️', ph: "J'accroche mon tableau au mur.", hint: "Tableau finit par E A U." },
+  { th: 'musique', id: 'musique', s: 'mu-[s]i-[qu]e', e: '🎵', ph: "J'écoute de la musique.", hint: "Musique : le S entre deux voyelles fait z, et Q U fait k." },
+  { th: 'musique', id: 'guitare', s: '[gu]i-ta-r(e)', e: '🎸', ph: "Je joue de la guitare.", hint: "Guitare : G U I fait gui, et un E muet à la fin." },
+  { th: 'musique', id: 'chanson', s: '[ch][an]-[s][on]', e: '🎤', ph: "Je chante ma chanson préférée.", hint: "Chanson : C H, A N, puis S O N." },
+  { th: 'musique', id: 'rythme', s: 'r[y]-[th]m(e)', e: '🥁', ph: "Je tape le rythme avec les mains.", hint: "Rythme : un Y, puis T H. Un vrai mot piège !" },
+
   // --- Les animaux (gardés selon l'espèce des animaux guides) ---
   { th: 'chien', id: 'chien', s: 'chi[en]', e: '🐶', ph: "Mon chien remue la queue.", hint: "Chien finit par E N, comme bien." },
   { th: 'chien', id: 'aboyer', s: 'a-bo-[y][er]', e: '🐕', ph: "Le chien se met à aboyer.", hint: "Aboyer : un Y au milieu, et E R à la fin, comme les verbes." },
@@ -246,6 +264,46 @@ ZDATA.problems = [
     q: ["Combien de kilomètres par sortie ?", "Combien de sorties ?", "Combien de kilomètres en tout ?"],
     op: '÷', a: 45, b: 5, r: 9, unit: 'km',
     end: ["Chaque sortie fait 9 kilomètres.", "Chaque sortie fait 9 sorties."] },
+  { th: 'danse', id: 'da1', e: '💃', schema: 'groupes', unknown: 'tout',
+    text: "Au spectacle de danse, il y a {5} rangées de {8} danseurs. Le rideau s'ouvre à {20!} heures. Combien de danseurs y a-t-il en tout ?",
+    q: ["Combien de danseurs en tout ?", "À quelle heure s'ouvre le rideau ?", "Combien de rangées ?"],
+    op: '×', a: 5, b: 8, r: 40, unit: 'danseurs',
+    end: ["Il y a 40 danseurs en tout.", "Il y a 40 rideaux."] },
+  { th: 'danse', id: 'da2', e: '⏱️', schema: 'parties', unknown: 'partie',
+    text: "La chorégraphie dure {12} minutes. @enfant a déjà dansé {7} minutes. Les chaussons coûtent {25!} euros. Combien de minutes reste-t-il ?",
+    q: ["Combien de minutes reste-t-il ?", "Combien coûtent les chaussons ?", "Combien dure la chorégraphie ?"],
+    op: '-', a: 12, b: 7, r: 5, unit: 'minutes',
+    end: ["Il reste 5 minutes de danse.", "Il reste 5 euros."] },
+  { th: 'velo', id: 've1', e: '🚲', schema: 'parties', unknown: 'partie',
+    text: "La balade à vélo fait {42} kilomètres. @enfant a déjà roulé {27} kilomètres. Son vélo a {2!} roues. Combien de kilomètres reste-t-il ?",
+    q: ["Combien de kilomètres reste-t-il ?", "Combien de roues a le vélo ?", "Combien de kilomètres en tout ?"],
+    op: '-', a: 42, b: 27, r: 15, unit: 'km',
+    end: ["Il reste 15 kilomètres à rouler.", "Il reste 15 roues."] },
+  { th: 'velo', id: 've2', e: '🚴', schema: 'partage', unknown: 'part',
+    text: "{24} cyclistes partent en {4} groupes égaux. La course commence à {9!} heures. Combien de cyclistes y a-t-il dans chaque groupe ?",
+    q: ["Combien de cyclistes par groupe ?", "À quelle heure commence la course ?", "Combien de groupes ?"],
+    op: '÷', a: 24, b: 4, r: 6, unit: 'cyclistes',
+    end: ["Il y a 6 cyclistes dans chaque groupe.", "Il y a 6 heures dans chaque groupe."] },
+  { th: 'peinture', id: 'pe1', e: '🌻', schema: 'groupes', unknown: 'tout',
+    text: "@enfant peint {3} tableaux. Sur chaque tableau, @il peint {7} fleurs. Son pinceau mesure {18!} centimètres. Combien de fleurs a-t-@il peintes en tout ?",
+    q: ["Combien de fleurs en tout ?", "Combien mesure le pinceau ?", "Combien de tableaux ?"],
+    op: '×', a: 3, b: 7, r: 21, unit: 'fleurs',
+    end: ["@enfant a peint 21 fleurs en tout.", "@enfant a peint 21 pinceaux."] },
+  { th: 'peinture', id: 'pe2', e: '🎨', schema: 'comparaison', unknown: 'ecart',
+    text: "La boîte d'aquarelle a {24} couleurs. La boîte de feutres a {12} couleurs. Le cahier de dessin a {48!} pages. Combien de couleurs la boîte d'aquarelle a-t-elle de plus ?",
+    q: ["Combien de couleurs de plus ?", "Combien de pages a le cahier ?", "Combien de couleurs en tout ?"],
+    op: '-', a: 24, b: 12, r: 12, unit: 'couleurs',
+    end: ["La boîte d'aquarelle a 12 couleurs de plus.", "La boîte d'aquarelle a 12 pages de plus."] },
+  { th: 'musique', id: 'mu1', e: '🎵', schema: 'groupes', unknown: 'tout',
+    text: "Une chanson a {4} couplets. Chaque couplet dure {30} secondes. Le concert commence à {18!} heures. Combien de secondes durent les couplets en tout ?",
+    q: ["Combien de secondes en tout ?", "À quelle heure commence le concert ?", "Combien de couplets ?"],
+    op: '×', a: 4, b: 30, r: 120, unit: 'secondes',
+    end: ["Les couplets durent 120 secondes en tout, soit 2 minutes.", "Les couplets durent 120 concerts."] },
+  { th: 'musique', id: 'mu2', e: '🎸', schema: 'parties', unknown: 'partie',
+    text: "Le concert dure {90} minutes. Le groupe a déjà joué {55} minutes. Il y a {4!} musiciens. Combien de minutes reste-t-il ?",
+    q: ["Combien de minutes reste-t-il ?", "Combien y a-t-il de musiciens ?", "Combien dure le concert ?"],
+    op: '-', a: 90, b: 55, r: 35, unit: 'minutes',
+    end: ["Il reste 35 minutes de concert.", "Il reste 35 musiciens."] },
   { th: 'karate', id: 'k1', e: '👊', schema: 'groupes', unknown: 'tout',
     text: "Au karaté, @enfant fait {6} séries de {8} coups de poing. La séance dure {45!} minutes. Combien de coups de poing @enfant fait-@il en tout ?",
     q: ["Combien de coups de poing en tout ?", "Combien de temps dure la séance ?", "Combien de séries ?"],
@@ -382,10 +440,39 @@ ZDATA.praise = [
   "Tu progresses à toute vitesse !", (/^f/i.test(PROFIL.enfant.genre || '') ? "Trop forte, " : "Trop fort, ") + PROFIL.enfant.pseudo + " !", "Génial, continue !",
   "Tu as bien réfléchi !", "Waouh, quelle concentration !"
 ];
+/* Le ton change avec l'âge : plus sobre au lycée, plus « stylé » au collège */
+ZDATA.TON = /lycee/.test(PROFIL.niveau || '') ? 'lycee' : /cycle4/.test(PROFIL.niveau || '') ? 'college' : 'enfant';
+if (ZDATA.TON === 'college') ZDATA.praise = ["Bien vu !", "Tu gères !", "Stylé !", "Ça, c'est propre !", "Rien à redire !", "Ton cerveau est en mode turbo !", "Bien joué, " + PROFIL.enfant.pseudo + " !", "Tu as pris le temps, et ça paie !"];
+if (ZDATA.TON === 'lycee') ZDATA.praise = ["Bien joué.", "Solide.", "C'est juste, et bien raisonné.", "Propre, rien à redire.", "Belle méthode.", "Tu maîtrises.", "Exactement.", "Bonne réponse, sans hésiter."];
+ZDATA.citations = [
+  "Le seul endroit où le succès arrive avant le travail, c'est le dictionnaire.",
+  "Une erreur, c'est juste une bonne réponse qui a pris un détour.",
+  "Ton cerveau fait une mise à jour. Merci de ne pas éteindre l'appareil.",
+  "Un escargot finit toujours la course. Lentement, mais il la finit.",
+  "Les fractions ne mordent pas. Enfin, presque jamais.",
+  "Réviser dix minutes par jour, c'est comme mettre une pièce dans la tirelire.",
+  "Procrastiner, c'est remettre à demain ce qu'on aurait fini en cinq minutes.",
+  "Personne n'est nul en maths. Certains n'ont juste pas encore trouvé le bon chemin.",
+  "Le stylo est plus fort que l'épée. Surtout quand l'épée n'a pas révisé.",
+  "Même les champions ont commencé par perdre. Beaucoup."
+];
+ZDATA.blagues = [
+  "Pourquoi le livre de maths est-il triste ? Parce qu'il a trop de problèmes.",
+  "Que dit un zéro à un huit ? « Sympa, ta ceinture. »",
+  "Un neutron entre dans un bar et demande l'addition. Le barman : « Pour toi, c'est gratuit : aucune charge. »",
+  "Deux atomes se croisent. « J'ai perdu un électron. — Tu es sûr ? — Oui, je suis positif. »",
+  "Pourquoi les plongeurs plongent-ils en arrière ? Parce que sinon, ils tombent dans le bateau.",
+  "Le subjonctif imparfait : « Il eût fallu que tu le susses. » Courage.",
+  "La philo, c'est répondre à une question par trois autres questions. Et c'est noté sur 20.",
+  "Pourquoi les poissons détestent-ils l'ordinateur ? Parce qu'ils ont peur du Net.",
+  "Il y a 10 sortes de personnes : celles qui comprennent le binaire, et les autres.",
+  "Un historien entre dans un café. Il commande… ce qu'on commandait en 1789."
+];
 ZDATA.retry = [
   "Presque ! Essaie encore.", "Pas grave, ton cerveau apprend en se trompant.",
   "On réessaie ensemble ?", "Tu y es presque !", "Une erreur, c'est un entraînement !"
 ];
+if (ZDATA.TON === 'lycee') ZDATA.retry = ["Pas tout à fait. Reprends calmement.", "Presque. Relis la question.", "Une erreur, c'est une information. On recommence.", "Pas encore : regarde le détail."];
 
 /* L'entourage qui encourage à la fin des jeux (facultatif) */
 ZDATA.family = PROFIL.entourage.map((p, i) => ({ id: 'p' + i, name: p.nom, emoji: p.emoji || '🙂', homme: !!p.homme, cheers: (p.encouragements || []).map(s => ZDATA.remplir(s)) }));

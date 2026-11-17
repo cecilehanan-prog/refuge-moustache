@@ -493,3 +493,30 @@ body.ado .scene .cat { width: 78px; }
 body.ado .scene .cloud, body.ado .scene .sun { opacity: .5; }
 body.ado .hello h1 { font-size: 1.4em; }
 body.sans-guides .world .ico { background: rgba(255,255,255,.18); }
+
+/* ---------- Canevas : trois tons selon l'âge ---------- */
+.mot-jour { display: grid; gap: 6px; border-left: 6px solid var(--blue); }
+body.lycee { --radius: 10px; }
+body.lycee .world { box-shadow: 0 2px 0 rgba(0,0,0,.15); filter: saturate(.85); }
+body.lycee .scene { height: 160px; }
+body.lycee .scene .cloud { display: none; }
+body.lycee .hello h1 { font-size: 1.3em; letter-spacing: .01em; }
+body.lycee .chest { filter: saturate(.8); }
+
+/* ---------- Canevas : façons de faire (dys, TDAH, TSA, HPI) ---------- */
+body.adapt-dys #app { letter-spacing: .04em; word-spacing: .12em; line-height: 1.75; }
+.devoirs-bar { height: 12px; background: #e5e7eb; border-radius: 99px; overflow: hidden; margin-top: 6px; }
+.devoirs-bar i { display: block; height: 100%; background: var(--blue); }
+.devoir.prochain { outline: 4px solid var(--gold, #facc15); outline-offset: 2px; }
+.plan-tsa ol { margin: 6px 0 0 1.2em; padding: 0; display: grid; gap: 4px; }
+body.adapt-tsa .ball, body.adapt-tsa .scene .cloud { animation: none; }
+
+/* ---------- Univers : scène de spectacle (danse, musique) et atelier (peinture) ---------- */
+.scene.scene-spectacle { background: linear-gradient(#312e81, #6d28d9); }
+.scene.scene-spectacle::before { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse at 28% 0, rgba(253,224,71,.38), transparent 62%), radial-gradient(ellipse at 76% 0, rgba(244,114,182,.32), transparent 62%); }
+.scene.scene-spectacle .sun, .scene.scene-spectacle .cloud { display: none; }
+.scene.scene-spectacle .ground { background: repeating-linear-gradient(90deg, #b45309 0 50px, #92400e 50px 52px); border-top-color: #78350f; }
+.scene.scene-atelier { background: linear-gradient(#fff7ed, #fed7aa); }
+.scene.scene-atelier .sun, .scene.scene-atelier .cloud { display: none; }
+.scene.scene-atelier .ground { background: repeating-linear-gradient(90deg, #d6a461 0 50px, #c08a45 50px 52px); border-top-color: #92400e; }

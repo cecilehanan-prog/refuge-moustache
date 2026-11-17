@@ -78,6 +78,13 @@
       a.rappel ? h('div', { class: 'card rule' }, h('b', null, '📌 À retenir : '), a.rappel, Z.ear(a.rappel)) : null,
       h('button', { class: 'btn green wide', onclick: () => { Z.sfx.tap(); M(ctx, a); } }, '▶️ C\'est parti !'));
   };
+  /* Les devoirs utilisent les mêmes moteurs (qcm, trous, paires…) */
+  Z.lancerMoteur = function (shell, a, fin) {
+    const Mo = MOTEURS[a.moteur || a.type];
+    if (!Mo) { Z.pop('Type inconnu : ' + (a.moteur || a.type), 'soft'); return; }
+    Mo(makeCtx(shell, null, a, fin), a);
+  };
+  Z.consigneDe = (type) => DEF_CONSIGNE[type];
   /* Pour le jeu d'orthographe : les mots d'une activité */
   Z.motsActivite = (o) => { const a = actOf(o.rid, o.aid); return (a && a.mots) || []; };
 
@@ -93,7 +100,7 @@
   };
 
   /* Outils communs aux moteurs : étapes, score, fin */
-  function makeCtx(shell, rid, a) {
+  function makeCtx(shell, rid, a, fin) {
     let firstTry = 0, total = 0;
     return {
       shell, rid, a,
@@ -101,6 +108,7 @@
       clear(step, n) { shell.clear(); shell.setSteps(n, step); },
       next(btnLabel, fn) { return h('button', { class: 'btn green wide', onclick: () => { Z.sfx.tap(); fn(); } }, btnLabel || 'Suivant ➡️'); },
       finish(lines = []) {
+        if (fin) return fin({ firstTry, total, lines });
         const r = (Z.state.acts = Z.state.acts || {});
         const k = actKey(rid, a);
         r[k] = r[k] || { n: 0, best: 0 };

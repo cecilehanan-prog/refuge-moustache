@@ -41,10 +41,15 @@ Z.dayNum = (iso = Z.today()) => { const [y, m, d] = iso.split('-').map(Number); 
 /* ---------- Sauvegarde (reste sur le téléphone) ---------- */
 /* Aides réglées dans profil.js (modifiables ensuite dans l'espace parents) */
 Z.ADO = /cycle4|lycee/.test(PROFIL.niveau || '');
+/* Le ton selon l'âge : 'enfant' (CP-6e), 'college' (5e-3e), 'lycee' (2de-Tle) */
+Z.TON = /lycee/.test(PROFIL.niveau || '') ? 'lycee' : /cycle4/.test(PROFIL.niveau || '') ? 'college' : 'enfant';
+/* Les façons de faire, cumulables : 'dys', 'tdah', 'tsa', 'hpi' */
+Z.ADAPT = (PROFIL.adaptations || []).map(x => String(x).toLowerCase());
+Z.adapte = (x) => Z.ADAPT.includes(x);
 Z.GUIDES = !(PROFIL.style && PROFIL.style.guides === false);
 Z.aidesParDefaut = () => {
   const A = PROFIL.aides || {};
-  return { autoRead: A.lectureAuto !== false, police: A.police || 'andika', taille: A.taille || 1, espacement: A.espacement !== false,
+  return { autoRead: A.lectureAuto !== undefined ? A.lectureAuto !== false : (Z.TON === 'enfant' || Z.adapte('dys')), police: A.police || 'andika', taille: A.taille || 1, espacement: A.espacement !== false,
     syllabes: A.syllabes !== false, cartoon: A.voixDessinAnime !== undefined ? !!A.voixDessinAnime : !Z.ADO };
 };
 /* Une clé de sauvegarde PAR élève : plusieurs applis sur la même adresse GitHub ne se mélangent pas */
@@ -273,6 +278,7 @@ Z.sfx = {
 
 /* ---------- Confettis ---------- */
 Z.confetti = function (n = 110) {
+  if (Z.adapte('tsa')) return;
   const cv = Z.h('canvas', { class: 'confetti' });
   document.body.appendChild(cv);
   const W = cv.width = innerWidth, H = cv.height = innerHeight, g = cv.getContext('2d');
