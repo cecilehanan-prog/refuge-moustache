@@ -379,7 +379,7 @@ ZDATA.stickers = [
 /* Phrases d'encouragement : on félicite l'EFFORT et la MÉTHODE, pas le "don". */
 ZDATA.praise = [
   "Bravo, tu as pris ton temps !", "Super, ton cerveau s'entraîne !", "Excellent travail !",
-  "Tu progresses à toute vitesse !", "Trop fort, " + PROFIL.enfant.pseudo + " !", "Génial, continue !",
+  "Tu progresses à toute vitesse !", (/^f/i.test(PROFIL.enfant.genre || '') ? "Trop forte, " : "Trop fort, ") + PROFIL.enfant.pseudo + " !", "Génial, continue !",
   "Tu as bien réfléchi !", "Waouh, quelle concentration !"
 ];
 ZDATA.retry = [

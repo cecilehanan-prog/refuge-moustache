@@ -57,10 +57,10 @@ window.ZCONTENU = {
       ] },
     { id: 'connecteurs', type: 'cartes', titre: 'Les connecteurs logiques', notion: 'Argumenter',
       cartes: [
-        { recto: 'Donc, ainsi, c\'est pourquoi… expriment…', verso: 'La conséquence. « J\'ai bien mangé, donc j\'ai de l\'énergie. »' },
-        { recto: 'Car, parce que, puisque… expriment…', verso: 'La cause. « Je ralentis car la pente est raide. »' },
-        { recto: 'Mais, pourtant, cependant… expriment…', verso: 'L\'opposition. « J\'étais fatiguée, pourtant j\'ai fini la course. »' },
-        { recto: 'D\'abord, ensuite, enfin… servent à…', verso: 'Organiser les idées dans l\'ordre.' }
+        { recto: 'Donc, ainsi, c\'est pourquoi… expriment…', choix: ['La conséquence', 'La cause', 'L\'opposition', 'Le but'], verso: 'La conséquence. « J\'ai bien mangé, donc j\'ai de l\'énergie. »' },
+        { recto: 'Car, parce que, puisque… expriment…', choix: ['La cause', 'La conséquence', 'L\'opposition', 'Le temps'], verso: 'La cause. « Je ralentis car la pente est raide. »' },
+        { recto: 'Mais, pourtant, cependant… expriment…', choix: ['L\'opposition', 'La cause', 'La conséquence', 'L\'addition'], verso: 'L\'opposition. « J\'étais fatiguée, pourtant j\'ai fini la course. »' },
+        { recto: 'D\'abord, ensuite, enfin… servent à…', choix: ['Organiser les idées dans l\'ordre', 'Exprimer une cause', 'Exprimer une opposition', 'Donner un exemple'], verso: 'Organiser les idées dans l\'ordre.' }
       ] }
   ],
 
@@ -78,11 +78,11 @@ window.ZCONTENU = {
       ] },
     { id: 'conversions', type: 'cartes', titre: 'Les conversions utiles', notion: 'Durées, unités',
       cartes: [
-        { recto: '1 h 30 min = combien de minutes ?', verso: '90 minutes.' },
-        { recto: '2,5 h = combien d\'heures et de minutes ?', verso: '2 h 30 min. 0,5 h = une demi-heure.' },
-        { recto: '1 L = combien de cl ?', verso: '100 cl.' },
-        { recto: '12 km/h, c\'est combien de km en 15 minutes ?', verso: '3 km. 15 min = un quart d\'heure, et 12 ÷ 4 = 3.' },
-        { recto: '1 kg = combien de grammes ?', verso: '1 000 g.' }
+        { recto: '1 h 30 min = combien de minutes ?', choix: ['90 minutes', '130 minutes', '80 minutes', '60 minutes'], verso: '90 minutes.' },
+        { recto: '2,5 h = combien d\'heures et de minutes ?', choix: ['2 h 30 min', '2 h 50 min', '2 h 05 min', '2 h 25 min'], verso: '2 h 30 min. 0,5 h = une demi-heure.' },
+        { recto: '1 L = combien de cl ?', choix: ['100 cl', '10 cl', '1 000 cl', '50 cl'], verso: '100 cl.' },
+        { recto: '12 km/h, c\'est combien de km en 15 minutes ?', choix: ['3 km', '4 km', '12 km', '1,5 km'], verso: '3 km. 15 min = un quart d\'heure, et 12 ÷ 4 = 3.' },
+        { recto: '1 kg = combien de grammes ?', choix: ['1 000 g', '100 g', '10 000 g', '10 g'], verso: '1 000 g.' }
       ] },
     { id: 'enquetes', type: 'jeu', jeu: 'problemes', notion: 'Résoudre un problème' }
   ],
@@ -109,11 +109,11 @@ window.ZCONTENU = {
       ] },
     { id: 'reperes', type: 'cartes', titre: 'Mes dates repères', notion: 'Repères',
       cartes: [
-        { recto: '1789', verso: 'La Révolution française.' },
-        { recto: '1848', verso: 'Abolition définitive de l\'esclavage et suffrage universel masculin.' },
-        { recto: '1914-1918', verso: 'La Première Guerre mondiale.' },
-        { recto: '1944', verso: 'Les femmes obtiennent le droit de vote en France.' },
-        { recto: '1958', verso: 'Début de la Ve République.' }
+        { recto: 'Que se passe-t-il en 1789 ?', choix: ['La Révolution française', 'Le couronnement de Napoléon', 'La fin de la monarchie de Juillet', 'La prise de Constantinople'], verso: 'La Révolution française.' },
+        { recto: 'Que se passe-t-il en 1848 ?', choix: ['Abolition de l\'esclavage et suffrage universel masculin', 'La Révolution française', 'Le droit de vote des femmes', 'Le début de la Ve République'], verso: 'Abolition définitive de l\'esclavage et suffrage universel masculin.' },
+        { recto: 'Que se passe-t-il de 1914 à 1918 ?', choix: ['La Première Guerre mondiale', 'La Seconde Guerre mondiale', 'La guerre de Cent Ans', 'La guerre d\'Algérie'], verso: 'La Première Guerre mondiale.' },
+        { recto: 'Que se passe-t-il en 1944 ?', choix: ['Les femmes obtiennent le droit de vote', 'L\'abolition de l\'esclavage', 'La fin de la Première Guerre mondiale', 'Le début de la Ve République'], verso: 'Les femmes obtiennent le droit de vote en France.' },
+        { recto: 'Que se passe-t-il en 1958 ?', choix: ['Début de la Ve République', 'Fin de la Seconde Guerre mondiale', 'Mai 68', 'Droit de vote des femmes'], verso: 'Début de la Ve République.' }
       ] },
     { id: 'points-cardinaux', type: 'schema', titre: 'S\'orienter en montagne', notion: 'Se repérer',
       fond: 'roseDesVents',

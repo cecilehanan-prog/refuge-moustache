@@ -86,7 +86,7 @@
     trous: 'Complète chaque trou avec le bon mot.',
     paires: 'Relie chaque élément de gauche à celui qui va avec, à droite.',
     ordre: 'Remets les éléments dans le bon ordre. Touche-les l\'un après l\'autre.',
-    cartes: 'Lis la question, réfléchis, puis retourne la carte. Dis honnêtement si tu savais.',
+    cartes: 'Lis la question et choisis une réponse parmi les 4. Ensuite, retourne la carte pour vérifier.',
     calcul: 'Calcule, puis tape ta réponse.',
     redaction: 'On écrit ensemble, étape par étape.',
     schema: 'Trouve le nom de chaque partie du dessin.'
@@ -276,12 +276,41 @@
       if (i >= list.length) return ctx.finish(['Les cartes reviendront au bon moment pour bien les retenir 🧠']);
       const c = list[i];
       ctx.clear(i, list.length);
-      const verso = h('div', { class: 'card rule', style: { display: 'none' } }, c.verso, Z.ear(c.verso));
-      const btns = h('div', { class: 'col', style: { display: 'none' } },
-        h('button', { class: 'btn green wide', onclick: () => { Z.srsUpdate(st, c.key, true); ctx.ok(true); Z.sfx.good(); Z.save(); i++; show(); } }, '✅ Je savais'),
-        h('button', { class: 'btn ghost wide', onclick: () => { Z.srsUpdate(st, c.key, false); ctx.ok(false); Z.save(); i++; show(); } }, '🔁 À revoir'));
-      const flip = h('button', { class: 'btn purple wide', onclick: () => { Z.sfx.tap(); verso.style.display = ''; btns.style.display = ''; flip.remove(); say(c.verso); } }, '🔄 Retourner la carte');
-      ctx.shell.root.append(h('div', { class: 'card center', style: { minHeight: '120px', fontSize: '1.2em', fontWeight: 700, display: 'grid', placeItems: 'center' } }, c.recto), Z.ear(c.recto), flip, verso, btns);
+      /* 4 réponses : celles de la carte (choix, la 1re est la bonne), sinon on prend
+         les réponses des autres cartes du paquet comme pièges. */
+      const court = (v) => String(v).split(/\.\s|\. ?$/)[0].trim();
+      const bonne = c.choix ? c.choix[0] : court(c.verso);
+      let pieges = c.choix ? c.choix.slice(1) : Z.shuffle(all.filter(x => x !== c && court(x.verso) !== bonne).map(x => court(x.verso))).slice(0, 3);
+      const opts = Z.shuffle([{ t: bonne, ok: true }].concat(pieges.map(t => ({ t, ok: false }))));
+      let choisi = null;
+      const verso = h('div', { class: 'card rule', style: { display: 'none' } });
+      const suite = h('div', { class: 'col' });
+      const choixEl = h('div', { class: 'col' }, opts.map(o => {
+        const b = h('button', { class: 'opt', onclick: () => {
+          if (choixEl.dataset.done) return;
+          choixEl.querySelectorAll('.opt').forEach(x => x.style.outline = '');
+          b.style.outline = '4px solid var(--gold)'; choisi = { o, b }; Z.sfx.tap();
+          flip.disabled = false; aide.textContent = 'Maintenant, retourne la carte pour vérifier.';
+        } }, h('span', null, o.t), Z.ear(o.t));
+        o.b = b; return b;
+      }));
+      const aide = h('div', { class: 'hint center' }, 'Choisis la réponse qui te semble juste.');
+      const flip = h('button', { class: 'btn purple wide', disabled: true, onclick: () => {
+        if (!choisi) return;
+        choixEl.dataset.done = 1; flip.remove(); aide.remove();
+        choisi.b.style.outline = '';
+        const juste = choisi.o.ok;
+        opts.find(o => o.ok).b.classList.add('good');
+        if (!juste) { choisi.b.classList.add('bad'); Z.sfx.bad(); } else Z.sfx.good();
+        Z.srsUpdate(st, c.key, juste); ctx.ok(juste); Z.save();
+        const reste = String(c.verso).startsWith(bonne) ? String(c.verso).slice(bonne.length).replace(/^[.\s]+/, '') : String(c.verso);
+        const plus = reste ? ' ' + reste : '';
+        const t = juste ? '✅ ' + okSay() + ' ' + c.verso : `❌ Pas tout à fait. La bonne réponse : ${bonne}.${plus}`;
+        verso.append(h('span', null, t), Z.ear(t)); verso.style.display = '';
+        say(t.replace(/^[✅❌]\s/, ''));
+        suite.append(ctx.next('Carte suivante ➡️', () => { i++; show(); }));
+      } }, '🔄 Retourner la carte');
+      ctx.shell.root.append(h('div', { class: 'card center', style: { minHeight: '100px', fontSize: '1.2em', fontWeight: 700, display: 'grid', placeItems: 'center' } }, c.recto), Z.ear(c.recto), choixEl, aide, flip, verso, suite);
       say(c.recto);
     };
     show();
