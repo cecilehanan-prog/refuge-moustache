@@ -138,6 +138,9 @@
       const card = h('div', { class: 'card plan-tsa' }, h('b', null, '🗺️ Ce que je vais faire'), h('ol', null, plan.map(x => h('li', null, x))), Z.ear(t));
       if (h2) h2.after(card); else shell.root.prepend(card);
     }
+    /* Pictos, étapes numérotées, consigne d'origine, traduction */
+    const extras = Z.consigneBloc(it);
+    if (extras.length) { const h2 = shell.root.querySelector('h2'); let ref = h2 && h2.nextElementSibling; ref = shell.root.querySelector('.guide-says') || ref; if (ref) ref.after(...extras); else shell.root.append(...extras); }
     /* HPI : pourquoi on fait cet exercice */
     if (Z.adapte('hpi') && it.pourquoi) {
       const h2 = shell.root.querySelector('h2');

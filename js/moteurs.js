@@ -14,6 +14,7 @@
      orthographe écrire des mots (syllabes, pièges, lettres muettes)
      redaction   écrire un texte étape par étape, validé par l'adulte
      schema      légender un dessin
+     posee       opération posée (+ − ×) : l'élève remplit les chiffres case par case
      jeu         un des jeux intégrés : 'mots', 'tables', 'problemes', 'route'
 
    Ce fichier ne contient AUCUN contenu d'élève.
@@ -40,7 +41,7 @@
   const actKey = (rid, a) => rid + ':' + a.id;
   const rec = (rid, a) => ((Z.state.acts = Z.state.acts || {})[actKey(rid, a)]);
 
-  const ICO = { qcm: '❓', trous: '🧩', paires: '🔗', ordre: '🔢', cartes: '🃏', calcul: '🧮', orthographe: '✍️', redaction: '📝', schema: '🏷️', jeu: '🎮' };
+  const ICO = { posee: '🧮', qcm: '❓', trous: '🧩', paires: '🔗', ordre: '🔢', cartes: '🃏', calcul: '🧮', orthographe: '✍️', redaction: '📝', schema: '🏷️', jeu: '🎮' };
   const JEUX = { mots: 'mots', tables: 'tables', problemes: 'problemes', route: 'route', parcours: 'route' };
   const titreAct = (a) => a.titre || (a.type === 'jeu' ? Z.titre(a.jeu === 'route' ? 'parcours' : a.jeu) : 'Activité');
 
@@ -74,7 +75,7 @@
     /* Intro : titre + consigne lue, puis on commence */
     shell.setSteps(0, 0);
     const t = a.consigne || DEF_CONSIGNE[a.type] || 'C\'est parti !';
-    shell.root.append(h('h2', null, (a.icone || ICO[a.type]) + ' ' + titreAct(a)), Z.guideSays(t),
+    shell.root.append(h('h2', null, (a.icone || ICO[a.type]) + ' ' + titreAct(a)), Z.guideSays(t), ...Z.consigneBloc(Object.assign({}, a, { consigne: t })),
       a.rappel ? h('div', { class: 'card rule' }, h('b', null, '📌 À retenir : '), a.rappel, Z.ear(a.rappel)) : null,
       h('button', { class: 'btn green wide', onclick: () => { Z.sfx.tap(); M(ctx, a); } }, '▶️ C\'est parti !'));
   };
@@ -96,7 +97,8 @@
     cartes: 'Lis la question et choisis une réponse parmi les 4. Ensuite, retourne la carte pour vérifier.',
     calcul: 'Calcule, puis tape ta réponse.',
     redaction: 'On écrit ensemble, étape par étape.',
-    schema: 'Trouve le nom de chaque partie du dessin.'
+    schema: 'Trouve le nom de chaque partie du dessin.',
+    posee: 'Pose l’opération. Remplis les cases une par une, en commençant par la droite.'
   };
 
   /* Outils communs aux moteurs : étapes, score, fin */
@@ -135,8 +137,24 @@
   const MOTEURS = {};
 
   /* ---------- QCM ---------- */
+  /* Trouver l'option qui ressemble le plus à ce qui a été dit */
+  const norm = (s) => String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+  Z.optionDite = (textes, options) => {
+    let best = null, score = 0;
+    for (const t of [].concat(textes)) {
+      const d = norm(t); if (!d) continue;
+      options.forEach(o => {
+        const n = norm(o.t); let s = 0;
+        if (n === d) s = 1000; else if (n.includes(d) || d.includes(n)) s = 500 + Math.min(n.length, d.length);
+        else { const mots = new Set(d.split(' ').filter(w => w.length > 2)); s = n.split(' ').filter(w => mots.has(w)).length * 10; }
+        if (s > score) { score = s; best = o; }
+      });
+    }
+    return best;
+  };
   MOTEURS.qcm = function (ctx, a) {
     const items = a.questions || [];
+    if (Z.adapte('hpi') && !Z.adapte('tdah') && items.length > 1) return qcmToutDunCoup(ctx, a, items);
     let i = 0;
     const show = () => {
       if (i >= items.length) return ctx.finish();
@@ -162,11 +180,37 @@
         }, h('span', null, o.t), Z.ear(o.t));
         return b;
       }));
-      ctx.shell.root.append(h('div', { class: 'card' }, h('div', { style: { fontWeight: 700, fontSize: '1.1em' } }, it.q), Z.ear(it.q)), list, after);
+      const mic = Z.adapte('moteur') ? Z.micBtn((t) => { const o = Z.optionDite(t, opts); if (o && o.b) o.b.click(); else Z.pop('Je n’ai pas reconnu la réponse. Réessaie, ou touche-la 🙂', 'soft'); }) : null;
+      opts.forEach((o, k) => { o.b = list.children[k]; });
+      ctx.shell.root.append(h('div', { class: 'card' }, h('div', { style: { fontWeight: 700, fontSize: '1.1em' } }, it.q), Z.ear(it.q)), list, mic, after);
       say(it.q);
     };
     show();
   };
+  /* HPI : toutes les questions d'un coup, dans l'ordre qu'on veut */
+  function qcmToutDunCoup(ctx, a, items) {
+    ctx.clear(0, 0);
+    let restent = items.length;
+    const fin = h('div', { class: 'col' });
+    const blocs = items.map((it, n) => {
+      let miss = 0;
+      const opts = Z.shuffle(it.choix.map((c, k) => ({ t: c, ok: k === 0 })));
+      const after = h('div', { class: 'col' });
+      const list = h('div', { class: 'col' }, opts.map(o => {
+        const b = h('button', { class: 'opt', onclick: () => {
+          if (list.dataset.done || b.classList.contains('bad')) return;
+          if (o.ok) {
+            list.dataset.done = 1; b.classList.add('good'); Z.sfx.good(); ctx.ok(!miss);
+            if (it.explication) after.append(h('div', { class: 'card rule' }, '✅ ', it.explication, Z.ear(it.explication)));
+            if (--restent === 0) { say(okSay()); fin.append(ctx.next('Voir mon résultat ➡️', () => ctx.finish())); }
+          } else { miss++; b.classList.add('bad'); Z.sfx.bad(); if (it.aide && miss === 1) after.append(h('div', { class: 'card' }, '💡 ', it.aide)); }
+        } }, h('span', null, o.t), Z.ear(o.t));
+        return b;
+      }));
+      return h('div', { class: 'col bloc-q' }, h('div', { class: 'card' }, h('b', null, `${n + 1}. `), h('span', { style: { fontWeight: 700 } }, it.q), Z.ear(it.q)), list, after);
+    });
+    ctx.shell.root.append(h('div', { class: 'hint center' }, `${items.length} questions, dans l’ordre que tu veux.`), ...blocs, fin);
+  }
 
   /* ---------- Texte à trous : « Le {chien|chat} aboie. » ---------- */
   MOTEURS.trous = function (ctx, a) {
@@ -342,7 +386,8 @@
           upd();
         }
       }, k);
-      const pad = h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' } }, ['7', '8', '9', '4', '5', '6', '1', '2', '3', ',', '0', '⌫'].map(key));
+      const pad = h('div', { class: 'pad', style: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' } }, ['7', '8', '9', '4', '5', '6', '1', '2', '3', ',', '0', '⌫'].map(key));
+      const mic = Z.adapte('moteur') ? Z.micBtn((t) => { const n = Z.nombreDit(t); if (n === null) { Z.pop('Je n’ai pas entendu de nombre. Réessaie 🙂', 'soft'); return; } val = String(n).replace('.', ','); upd(); say(val); }, '🎤 Dire le nombre') : null;
       const valider = h('button', {
         class: 'btn orange wide', onclick: () => {
           if (!val) return;
@@ -363,11 +408,163 @@
       }, '✔️ Valider');
       upd();
       ctx.shell.root.append(h('div', { class: 'card' }, h('div', { style: { fontWeight: 700 } }, it.q), Z.ear(it.q)),
-        it.figure ? Z.svg(figure(it.figure), 'card') : null, screen, pad, valider, after);
+        it.figure ? Z.svg(figure(it.figure), 'card') : null, screen, pad, mic, valider, after);
       say(it.q);
     };
     show();
   };
+
+  /* ---------- Opération posée, case par case ----------
+     { type: 'posee', operations: [ { a: 347, b: 158, op: '+' }, { a: 503, b: 128, op: '-' },
+       { a: 46, b: 7, op: '×' }, { a: 34, b: 12, op: '×' } ] }
+     L'élève remplit le résultat de droite à gauche. Les retenues s'écrivent
+     toutes seules, en rouge, comme sur le cahier. Une erreur → l'explication
+     du calcul de la colonne ; 2 erreurs → le chiffre est écrit pour lui.
+     Avec « dyscalculie », l'explication est affichée avant chaque case. */
+  const dig = (n, i) => Math.floor(n / Math.pow(10, i)) % 10;
+  const len = (n) => String(n).length;
+  function planPosee(o) {
+    const op = { '-': '−', '−': '−', x: '×', '*': '×', '×': '×' }[o.op] || '+';
+    let A = Math.round(o.a), B = Math.round(o.b);
+    if (op === '−' && B > A) [A, B] = [B, A];
+    const lignes = [], marques = [];      // lignes à remplir ; marques = retenues {ligne, col, t, ou}
+    const addition = (termes, total, ligne) => {
+      const cases = []; let r = 0;
+      for (let i = 0; i < len(total); i++) {
+        const ds = termes.map(t => t.decal <= i ? dig(t.n, i - t.decal) : null).filter((d, k) => d !== null && (i - termes[k].decal) < len(termes[k].n));
+        const s = ds.reduce((x, y) => x + y, 0) + r;
+        const txt = ds.length ? ds.join(' + ') + (r ? ` + ${r} (la retenue)` : '') : `${r} (la retenue)`;
+        const ecrit = s % 10, ret = Math.floor(s / 10);
+        cases.push({ col: i, val: ecrit, aide: ds.length + (r ? 1 : 0) > 1 ? `${txt} = ${s}. ${s >= 10 && i < len(total) - 1 ? `J’écris ${ecrit} et je retiens ${ret}.` : `J’écris ${s}.`}` : `Je descends le ${s}.`,
+          retenue: ret && i < len(total) - 1 ? { col: i + 1, t: String(ret) } : null });
+        r = ret;
+      }
+      lignes.push({ n: total, cases, ligne });
+    };
+    if (op === '+') addition([{ n: A, decal: 0 }, { n: B, decal: 0 }], A + B, 'res');
+    else if (op === '−') {
+      const cases = []; let emprunt = 0; const R = A - B;
+      for (let i = 0; i < len(A); i++) {
+        const haut = dig(A, i), bas = (i < len(B) ? dig(B, i) : 0) + emprunt;
+        if (i >= len(R) && haut - bas === 0 && i === len(A) - 1) break;
+        let txt, ret = 0, v;
+        if (haut >= bas) { v = haut - bas; txt = emprunt ? `${haut} − (${bas - emprunt} + 1 de retenue) = ${haut} − ${bas} = ${v}.` : `${haut} − ${bas} = ${v}.`; }
+        else { v = haut + 10 - bas; ret = 1; txt = `${haut} − ${bas} : c’est impossible. Je mets une retenue : ${haut + 10} − ${bas} = ${v}. J’ajoute 1 en bas, dans la colonne de gauche.`; }
+        cases.push({ col: i, val: v, aide: txt, retenue: ret ? { col: i, t: '1', ou: 'haut' } : null, retenue2: ret ? { col: i + 1, t: '+1', ou: 'bas' } : null });
+        emprunt = ret;
+      }
+      while (cases.length > len(R) && cases[cases.length - 1].val === 0) cases.pop();
+      lignes.push({ n: R, cases, ligne: 'res' });
+    } else {
+      const chiffres = String(B).split('').reverse().map(Number);
+      const partiels = chiffres.map((m, k) => ({ m, n: A * m * Math.pow(10, k), decal: k }));
+      partiels.forEach(p => {
+        const cases = []; let r = 0;
+        for (let j = 0; j < len(A); j++) {
+          const pr = dig(A, j) * p.m + r, ecrit = j === len(A) - 1 ? pr : pr % 10, ret = Math.floor(pr / 10);
+          const dernier = j === len(A) - 1;
+          if (dernier && pr >= 10) {
+            cases.push({ col: j + p.decal, val: pr % 10, aide: `${p.m} × ${dig(A, j)}${r ? ` + ${r} (la retenue)` : ''} = ${pr}. J’écris ${pr % 10}…`, retenue: null });
+            cases.push({ col: j + 1 + p.decal, val: Math.floor(pr / 10), aide: `…et j’écris ${Math.floor(pr / 10)} devant : ${pr}.`, retenue: null });
+          } else cases.push({ col: j + p.decal, val: dernier ? ecrit : pr % 10, aide: `${p.m} × ${dig(A, j)}${r ? ` + ${r} (la retenue)` : ''} = ${pr}.${!dernier && ret ? ` J’écris ${pr % 10} et je retiens ${ret}.` : ''}`, retenue: !dernier && ret ? { col: j + 1 + p.decal, t: String(ret) } : null });
+          r = ret;
+        }
+        if (p.m === 0) cases.forEach(c => { c.val = 0; c.aide = `${p.m} × ${'n’importe quel chiffre'} = 0.`; c.retenue = null; });
+        while (cases.length > 1 && cases[cases.length - 1].val === 0 && p.m === 0) cases.pop();
+        lignes.push({ n: p.n, cases, ligne: 'p', zeros: p.decal, m: p.m });
+      });
+      if (partiels.length > 1) addition(partiels.map(p => ({ n: p.n / Math.pow(10, p.decal), decal: p.decal })), A * B, 'res');
+    }
+    const res = op === '+' ? A + B : op === '−' ? A - B : A * B;
+    const W = Math.max(len(A), len(B), ...lignes.map(l => len(l.n)), ...lignes.map(l => (l.cases[l.cases.length - 1] || { col: 0 }).col + 1)) + 1;
+    return { A, B, op, lignes, W, res };
+  }
+  MOTEURS.posee = function (ctx, a) {
+    const items = a.operations || [];
+    let i = 0;
+    const guide = Z.adapte('dyscalculie') || a.guide;
+    const show = () => {
+      if (i >= items.length) return ctx.finish();
+      const P = planPosee(items[i]);
+      ctx.clear(i, items.length);
+      const W = P.W;
+      const grille = h('div', { class: 'posee', style: { gridTemplateColumns: `repeat(${W}, var(--case))` } });
+      const cellule = (cls, txt = '') => h('div', { class: 'pz ' + cls }, txt);
+      const ligneChiffres = (n, signe, cls = '') => {
+        const s = String(n), out = [];
+        for (let c = W - 1; c >= 0; c--) {
+          const k = s.length - 1 - c;
+          out.push(cellule('fixe ' + cls, c === W - 1 && signe ? signe : k >= 0 && c < s.length ? s[s.length - 1 - c] : ''));
+        }
+        return out;
+      };
+      /* rangée des retenues (au-dessus), puis A, puis B avec le signe */
+      const hautRet = [...Array(W)].map(() => cellule('ret'));
+      const ligA = ligneChiffres(P.A, ''), ligB = ligneChiffres(P.B, P.op);
+      const basRet = [...Array(W)].map(() => cellule('ret bas'));
+      grille.append(...hautRet, ...ligA, ...basRet, ...ligB);
+      /* les lignes à remplir */
+      const trait = () => [...Array(W)].map(() => cellule('trait'));
+      const vides = [];
+      P.lignes.forEach((l, li) => {
+        if (li === 0 || l.ligne === 'res') grille.append(...trait());
+        const row = [...Array(W)].map((_, k) => cellule('vide'));
+        const parCol = {};
+        l.cases.forEach(c => { parCol[c.col] = c; });
+        for (let c = 0; c < (l.zeros || 0); c++) { row[W - 1 - c].className = 'pz zero'; row[W - 1 - c].textContent = '0'; }
+        if (l.ligne === 'p' && P.lignes.length > 1 && l.zeros) row[0].textContent = '';
+        l.cases.forEach(c => { row[W - 1 - c.col].className = 'pz case'; vides.push({ el: row[W - 1 - c.col], c, li }); });
+        grille.append(...row);
+      });
+      let k = 0, miss = 0, total = 0;
+      const aideEl = h('div', { class: 'card aide-posee' });
+      const montrerAide = (force) => {
+        const v = vides[k]; aideEl.innerHTML = '';
+        if (!v) return;
+        if (guide || force) { aideEl.append('💡 ', h('span', null, v.c.aide), Z.ear(v.c.aide)); aideEl.style.display = ''; }
+        else aideEl.style.display = 'none';
+      };
+      const active = () => {
+        vides.forEach((v, n) => v.el.classList.toggle('cur', n === k));
+        /* les retenues de la multiplication changent à chaque ligne : on efface celles d'avant */
+        if (k > 0 && vides[k] && vides[k - 1] && vides[k].li !== vides[k - 1].li) { hautRet.forEach(x => { x.textContent = ''; }); }
+        montrerAide(false);
+      };
+      const poser = (d) => {
+        const v = vides[k]; if (!v) return;
+        if (d === v.c.val) {
+          Z.sfx.good(); v.el.textContent = String(d); v.el.classList.remove('cur'); v.el.classList.add('ok');
+          if (v.c.retenue) { const t = v.c.retenue; const cell = t.ou === 'haut' ? ligA[W - 1 - t.col] : hautRet[W - 1 - t.col]; if (t.ou === 'haut') cell.dataset.ret = t.t; else cell.textContent = t.t; }
+          if (v.c.retenue2) basRet[W - 1 - v.c.retenue2.col].textContent = v.c.retenue2.t;
+          k++; miss = 0;
+          if (k >= vides.length) return fini();
+          active();
+        } else {
+          Z.sfx.bad(); miss++; total++;
+          v.el.classList.add('shake'); setTimeout(() => v.el.classList.remove('shake'), 500);
+          montrerAide(true); say((miss >= 2 ? 'Regarde : ' : retrySay() + ' ') + v.c.aide);
+          if (miss >= 2) setTimeout(() => poser(v.c.val), 900);
+        }
+      };
+      const fini = () => {
+        ctx.ok(total === 0); pad.remove(); if (mic) mic.remove(); aideEl.style.display = 'none';
+        const t = `${okSay()} ${P.A} ${P.op} ${P.B} = ${P.res}.`;
+        after.append(h('div', { class: 'card rule' }, '✅ ', t, Z.ear(t)), ctx.next(null, () => { i++; show(); }));
+        say(t);
+      };
+      const pad = h('div', { class: 'pad', style: { display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '8px' } },
+        [1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map(d => h('button', { class: 'tile small', style: { minWidth: '0' }, onclick: () => { Z.sfx.click(); poser(d); } }, String(d))));
+      const mic = Z.adapte('moteur') ? Z.micBtn((t) => { const n = Z.nombreDit(t); if (n === null || n < 0 || n > 9) { Z.pop('Dis un seul chiffre, de 0 à 9 🙂', 'soft'); return; } poser(n); }, '🎤 Dire le chiffre') : null;
+      const after = h('div', { class: 'col' });
+      const q = `${P.A} ${P.op} ${P.B}`;
+      ctx.shell.root.append(h('div', { class: 'card center' }, h('b', { style: { fontSize: '1.3em' } }, q), Z.ear(q.replace('−', 'moins').replace('×', 'fois').replace('+', 'plus'))),
+        h('div', { class: 'card center posee-zone' }, grille), aideEl, pad, mic,
+        guide ? null : h('button', { class: 'btn ghost wide', onclick: () => { Z.sfx.tap(); montrerAide(true); say(vides[k] ? vides[k].c.aide : ''); } }, '💡 Comment on fait ?'), after);
+      active();
+    };
+    show();
+  };
+  Z.planPosee = planPosee;
 
   /* Figures de géométrie dessinées en SVG.
      { type: 'triangle-rectangle', a: '3 cm', b: '4 cm', c: '?', sommets: ['A','B','C'] }
@@ -414,7 +611,9 @@
       ctx.shell.root.append(h('h2', null, `✏️ Étape ${i + 1} : ${e.titre}`), Z.guideSays(e.consigne, { speak: false }),
         e.mots ? h('div', { class: 'card' }, h('b', null, '🧰 Mots utiles : '), e.mots.join(' · ')) : null,
         aide ? h('button', { class: 'btn ghost wide', onclick: (ev) => { aide.style.display = ''; ev.currentTarget.remove(); say(e.aide); } }, '💡 Un coup de pouce') : null, aide,
-        ta, h('button', { class: 'btn ghost wide', onclick: () => say(ta.value || 'Tu n\'as encore rien écrit.') }, '🔊 Écouter ce que j\'ai écrit'),
+        ta, Z.micBtn((t) => { const x = t[0].trim(); if (!x) return; const phrase = x.charAt(0).toUpperCase() + x.slice(1) + (/[.!?…]$/.test(x) ? '' : '.');
+          ta.value = (ta.value.trim() ? ta.value.trim() + ' ' : '') + phrase; store[i] = ta.value; Z.save(); }, '🎤 Dicter une phrase'),
+        h('button', { class: 'btn ghost wide', onclick: () => say(ta.value || 'Tu n\'as encore rien écrit.') }, '🔊 Écouter ce que j\'ai écrit'),
         ctx.next(i + 1 < E.length ? 'Étape suivante ➡️' : 'Relire mon texte ➡️', () => {
           if (!ta.value.trim()) { Z.pop('Écris au moins une phrase 🙂', 'soft'); say('Écris au moins une phrase.'); return; }
           i++; show();

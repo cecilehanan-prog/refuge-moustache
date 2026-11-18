@@ -43,13 +43,22 @@ Z.dayNum = (iso = Z.today()) => { const [y, m, d] = iso.split('-').map(Number); 
 Z.ADO = /cycle4|lycee/.test(PROFIL.niveau || '');
 /* Le ton selon l'âge : 'enfant' (CP-6e), 'college' (5e-3e), 'lycee' (2de-Tle) */
 Z.TON = /lycee/.test(PROFIL.niveau || '') ? 'lycee' : /cycle4/.test(PROFIL.niveau || '') ? 'college' : 'enfant';
-/* Les façons de faire, cumulables : 'dys', 'tdah', 'tsa', 'hpi' */
+/* Les façons de faire, cumulables :
+   'moteur' · 'dys' · 'dyscalculie' · 'tdah' · 'hpi' · 'tsa' · 'malvoyance' · 'allophone'
+   (profil.js → adaptations ; l'espace parents peut les changer ensuite) */
+Z.ADAPTATIONS = [
+  ['moteur', '✋ Moteur (main blessée, dyspraxie)'], ['dys', '📖 Dys (lecture, orthographe)'],
+  ['dyscalculie', '🔢 Dyscalculie'], ['tdah', '⚡ TDAH'], ['hpi', '🧠 HPI'], ['tsa', '🧩 TSA'],
+  ['malvoyance', '👓 Malvoyance'], ['allophone', '🌍 Allophone (UPE2A)']];
 Z.ADAPT = (PROFIL.adaptations || []).map(x => String(x).toLowerCase());
-Z.adapte = (x) => Z.ADAPT.includes(x);
+Z.adaptActives = () => (Z.state && Z.state.settings && Array.isArray(Z.state.settings.adapt)) ? Z.state.settings.adapt : Z.ADAPT;
+Z.adapte = (x) => Z.adaptActives().includes(x);
 Z.GUIDES = !(PROFIL.style && PROFIL.style.guides === false);
 Z.aidesParDefaut = () => {
   const A = PROFIL.aides || {};
-  return { autoRead: A.lectureAuto !== undefined ? A.lectureAuto !== false : (Z.TON === 'enfant' || Z.adapte('dys')), police: A.police || 'andika', taille: A.taille || 1, espacement: A.espacement !== false,
+  const lit = Z.TON === 'enfant' || ['dys', 'malvoyance', 'allophone'].some(x => Z.ADAPT.includes(x));
+  return { autoRead: A.lectureAuto !== undefined ? A.lectureAuto !== false : lit, police: A.police || 'andika', taille: Z.ADAPT.includes('malvoyance') ? Math.max(A.taille || 1, 1.6) : (A.taille || 1),
+    main: A.mainValide || null, calculatrice: !!A.calculatrice, lignes: A.lignesCouleur !== undefined ? !!A.lignesCouleur : Z.ADAPT.includes('dys'), espacement: A.espacement !== false,
     syllabes: A.syllabes !== false, cartoon: A.voixDessinAnime !== undefined ? !!A.voixDessinAnime : !Z.ADO };
 };
 /* Une clé de sauvegarde PAR élève : plusieurs applis sur la même adresse GitHub ne se mélangent pas */
@@ -578,3 +587,141 @@ Z.familySays = function (p, text, { speak = true } = {}) {
   }
   if (document.body) demarre(); else document.addEventListener('DOMContentLoaded', demarre);
 })();
+
+/* =========================================================
+   AMÉNAGEMENTS : dictée, autre langue, pictos, consignes, outils
+   ========================================================= */
+/* Réponse dictée à la voix (Chrome, Safari) */
+Z.peutDicter = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+Z.dicter = ({ lang = 'fr-FR', alts = 4 } = {}) => new Promise((res, rej) => {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return rej('absent');
+  const r = new SR(); let fini = false;
+  r.lang = lang; r.interimResults = false; r.maxAlternatives = alts; r.continuous = false;
+  r.onresult = (e) => { fini = true; res([...e.results[0]].map(x => x.transcript)); };
+  r.onerror = (e) => { if (!fini) { fini = true; rej(e.error || 'erreur'); } };
+  r.onend = () => { if (!fini) { fini = true; res([]); } };
+  Z.stopSpeak();
+  try { r.start(); } catch (e) { rej(e); }
+});
+Z.micBtn = (quandTexte, label = '🎤 Dire ma réponse') => {
+  if (!Z.peutDicter) return null;
+  const b = Z.h('button', { class: 'btn ghost wide mic', onclick: async () => {
+    Z.sfx.tap(); b.classList.add('ecoute'); b.textContent = '🎤 J’écoute…';
+    try {
+      const t = await Z.dicter();
+      b.classList.remove('ecoute'); b.textContent = label;
+      if (!t.length) { Z.pop('Je n’ai rien entendu. Réessaie 🙂', 'soft'); return; }
+      quandTexte(t);
+    } catch (e) {
+      b.classList.remove('ecoute'); b.textContent = label;
+      Z.pop(e === 'not-allowed' ? 'Le micro est bloqué : autorise-le dans le navigateur.' : 'Le micro ne marche pas ici.', 'soft');
+    }
+  } }, label);
+  return b;
+};
+/* « vingt-trois », « 23 », « trois virgule cinq »… → nombre (ou null) */
+Z.nombreDit = (textes) => {
+  const U = { zero: 0, 'zéro': 0, un: 1, une: 1, deux: 2, trois: 3, quatre: 4, cinq: 5, six: 6, sept: 7, huit: 8, neuf: 9, dix: 10, onze: 11, douze: 12, treize: 13, quatorze: 14, quinze: 15, seize: 16, vingt: 20, vingts: 20, trente: 30, quarante: 40, cinquante: 50, soixante: 60 };
+  for (const brut of [].concat(textes)) {
+    const t = String(brut).toLowerCase().replace(/(\d)\s+(?=\d{3}\b)/g, '$1').replace(/\s*virgule\s*/g, ',');
+    const m = t.match(/-?\d+(?:[.,]\d+)?/);
+    if (m) return parseFloat(m[0].replace(',', '.'));
+    const [ent, dec] = t.split(',');
+    const lire = (s) => {
+      let total = 0, cur = 0, vu = false, prev = '';
+      for (const w of s.split(/[\s-]+/).filter(Boolean)) {
+        if (w === 'et') continue;
+        if (w === 'cent' || w === 'cents') { cur = (cur || 1) * 100; vu = true; }
+        else if (w === 'mille') { total += (cur || 1) * 1000; cur = 0; vu = true; }
+        else if ((w === 'vingt' || w === 'vingts') && prev === 'quatre') { cur += 76; vu = true; }
+        else if (w in U) { cur += U[w]; vu = true; }
+        prev = w;
+      }
+      return vu ? total + cur : null;
+    };
+    const e = lire(ent || '');
+    if (e !== null) { const d = dec ? lire(dec) : null; return d !== null ? parseFloat(e + '.' + d) : e; }
+  }
+  return null;
+};
+/* Lire un texte dans une autre langue (élève allophone) */
+Z.speakLang = (text, lang) => {
+  if (!('speechSynthesis' in window) || !text) return;
+  Z.stopSpeak();
+  const u = new SpeechSynthesisUtterance(text); u.lang = lang || 'en-GB'; u.rate = 0.9;
+  const v = speechSynthesis.getVoices().find(v => v.lang && v.lang.toLowerCase().startsWith((lang || 'en').slice(0, 2).toLowerCase()));
+  if (v) u.voice = v;
+  speechSynthesis.speak(u);
+};
+/* TSA : des pictogrammes pour les verbes d'action de la consigne */
+Z.PICTOS = [
+  [/\b(lis|lire|relis|relire)\b/i, '👀', 'Lire'], [/\b(écoute|écouter)\b/i, '👂', 'Écouter'],
+  [/\b(observe|regarde)\b/i, '🔍', 'Observer'], [/\b(choisis|touche|clique|sélectionne|trouve)\b/i, '👆', 'Toucher'],
+  [/\b(écris|complète|recopie|remplis)\b/i, '✍️', 'Écrire'], [/\b(calcule|pose|compte)\b/i, '🧮', 'Calculer'],
+  [/\b(relie|associe)\b/i, '🔗', 'Relier'], [/\b(range|remets|classe)\b/i, '🔢', 'Ranger'],
+  [/\b(souligne)\b/i, '〰️', 'Souligner'], [/\b(entoure|encadre)\b/i, '⭕', 'Entourer'],
+  [/\b(apprends|retiens|mémorise)\b/i, '🧠', 'Apprendre'], [/\b(dis|récite|explique)\b/i, '🗣️', 'Dire']];
+Z.pictos = (texte) => {
+  const t = String(texte || '');
+  const vus = Z.PICTOS.map(([re, e, n]) => { const m = t.match(re); return m ? { i: m.index, e, n } : null; }).filter(Boolean).sort((a, b) => a.i - b.i);
+  if (!vus.length) return null;
+  return Z.h('div', { class: 'pictos' }, vus.map(p => Z.h('span', { class: 'picto' }, Z.h('b', null, p.e), p.n)));
+};
+/* Ce qui accompagne une consigne, selon les aménagements :
+   pictos (TSA), étapes numérotées (TDAH), consigne d'origine (si on l'a simplifiée),
+   traduction (allophone). */
+Z.consigneBloc = (a) => {
+  const h = Z.h, out = [], c = a.consigne || '';
+  if (Z.adapte('tsa')) { const p = Z.pictos(c); if (p) out.push(p); }
+  if (Z.adapte('tdah')) {
+    const ph = c.split(/(?<=[.!?…])\s+/).map(x => x.trim()).filter(Boolean);
+    if (ph.length >= 2) out.push(h('div', { class: 'card etapes' }, h('b', null, '🪜 Étape par étape'), h('ol', null, ph.map(x => h('li', null, x))), Z.ear(ph.map((x, i) => `Étape ${i + 1}. ${x}`).join(' '))));
+  }
+  if (a.consigneOrigine) {
+    const box = h('div', { class: 'card', style: { display: 'none' } }, h('b', null, '📄 Consigne du professeur : '), h('span', null, a.consigneOrigine), Z.ear(a.consigneOrigine));
+    out.push(h('button', { class: 'btn ghost wide', onclick: (e) => { Z.sfx.tap(); const v = box.style.display === 'none'; box.style.display = v ? '' : 'none'; e.currentTarget.textContent = v ? '📄 Cacher la consigne d’origine' : '📄 Voir la consigne d’origine'; } }, '📄 Voir la consigne d’origine'), box);
+  }
+  const L = PROFIL.langue;
+  if (Z.adapte('allophone') && a.traduction && L) {
+    out.push(h('div', { class: 'card traduction', dir: L.sens || 'auto' }, h('b', null, `🌍 ${L.nom || 'Dans ta langue'} : `), h('span', { lang: L.code }, a.traduction),
+      h('button', { class: 'ear', 'aria-label': 'Écouter', onclick: (e) => { e.stopPropagation(); Z.speakLang(a.traduction, L.code); } }, '🔊')));
+  }
+  return out;
+};
+
+/* Aide-mémoire : la table de Pythagore (dyscalculie) */
+Z.aideMemoire = () => {
+  const h = Z.h; let sel = null;
+  const cells = [];
+  const grille = h('div', { class: 'pytha' });
+  for (let r = 0; r <= 10; r++) for (let c = 0; c <= 10; c++) {
+    const head = r === 0 || c === 0;
+    const el = h('button', { class: 'pc' + (head ? ' tete' : ''), onclick: () => {
+      if (head) return;
+      cells.forEach(x => x.el.classList.toggle('lit', x.r === r && x.c <= c || x.c === c && x.r <= r));
+      Z.speak(`${r} fois ${c} égale ${r * c}`, { force: true });
+    } }, r === 0 && c === 0 ? '×' : head ? String(r || c) : String(r * c));
+    cells.push({ r, c, el }); grille.append(el);
+  }
+  Z.modal(h('div', { class: 'col' }, h('h2', null, '📋 Aide-mémoire'), h('p', { class: 'small-note' }, 'Touche une case : la ligne et la colonne s’allument, et j’explique le calcul.'), grille));
+};
+/* Calculatrice (seulement si le PAP l'autorise : réglage de l'espace parents) */
+Z.calculatrice = () => {
+  const h = Z.h; let v = '';
+  const ecran = h('div', { class: 'calc-ecran' }, '0');
+  const maj = () => { ecran.textContent = v || '0'; };
+  const calc = () => {
+    const s = v.replace(/×/g, '*').replace(/÷/g, '/').replace(/,/g, '.').replace(/−/g, '-');
+    if (!/^[0-9+\-*/.() ]+$/.test(s)) return;
+    try { const r = Function('"use strict";return (' + s + ')')(); if (isFinite(r)) { v = String(Math.round(r * 1e6) / 1e6).replace('.', ','); Z.speak(v, { force: true }); } } catch (e) { Z.pop('Calcul incomplet', 'soft'); }
+    maj();
+  };
+  const k = (t) => h('button', { class: 'tile small', onclick: () => {
+    Z.sfx.click();
+    if (t === 'C') v = ''; else if (t === '⌫') v = v.slice(0, -1); else if (t === '=') return calc(); else v += t;
+    maj();
+  } }, t);
+  Z.modal(h('div', { class: 'col' }, h('h2', null, '🧮 Calculatrice'), ecran,
+    h('div', { class: 'pad calc' }, ['7', '8', '9', '÷', '4', '5', '6', '×', '1', '2', '3', '−', '0', ',', '+', '=', 'C', '⌫', '(', ')'].map(k))));
+};

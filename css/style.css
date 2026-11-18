@@ -520,3 +520,51 @@ body.adapt-tsa .ball, body.adapt-tsa .scene .cloud { animation: none; }
 .scene.scene-atelier { background: linear-gradient(#fff7ed, #fed7aa); }
 .scene.scene-atelier .sun, .scene.scene-atelier .cloud { display: none; }
 .scene.scene-atelier .ground { background: repeating-linear-gradient(90deg, #d6a461 0 50px, #c08a45 50px 52px); border-top-color: #92400e; }
+
+/* ---------- Aménagements : moteur, main valide, malvoyance, dys, TDAH, TSA ---------- */
+body.main-droite .opt, body.main-droite .pad, body.main-droite .btn.wide, body.main-droite .mic { width: 84%; margin-left: auto; }
+body.main-gauche .opt, body.main-gauche .pad, body.main-gauche .btn.wide, body.main-gauche .mic { width: 84%; margin-right: auto; }
+body.adapt-moteur .opt { min-height: 84px; }
+body.adapt-moteur .tile.small { min-height: 72px; font-size: 1.6em; }
+.mic.ecoute { background: #fee2e2; border-color: #dc2626; animation: pulse 1s ease-in-out infinite; }
+@keyframes pulse { 50% { transform: scale(1.03); } }
+body.adapt-malvoyance { --line: #000; background: #fff; color: #000; }
+body.adapt-malvoyance #app { background: #fff; }
+body.adapt-malvoyance .card, body.adapt-malvoyance .opt, body.adapt-malvoyance .bubble, body.adapt-malvoyance .devoir, body.adapt-malvoyance .tile { border: 4px solid #000 !important; color: #000; background: #fff; }
+body.adapt-malvoyance .btn { border: 3px solid #000; font-weight: 800; }
+body.adapt-malvoyance .hint, body.adapt-malvoyance .small-note, body.adapt-malvoyance small { color: #000; opacity: 1; }
+body.adapt-malvoyance button:focus-visible { outline: 6px solid #facc15; outline-offset: 2px; }
+body.adapt-malvoyance .opt.good { background: #bbf7d0; } body.adapt-malvoyance .opt.bad { background: #fecaca; opacity: 1; }
+body.lignes-couleur .bubble > span, body.lignes-couleur .card.rule, body.lignes-couleur .bloc-q .card span {
+  display: block; line-height: 1.8em;
+  background-image: repeating-linear-gradient(to bottom, transparent 0 1.8em, rgba(250, 204, 21, .28) 1.8em 3.6em); }
+body.adapt-tdah .screen .mini-cat, body.adapt-tdah .topbar .chip.bolt { display: none; }
+body.adapt-tdah .screen .guide-says { grid-template-columns: 1fr; }
+.etapes ol, .plan-tsa ol { margin: 6px 0 0 1.3em; padding: 0; display: grid; gap: 6px; }
+.pictos { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 4px 0; }
+.picto { display: grid; place-items: center; gap: 2px; min-width: 76px; padding: 8px 6px; background: #fff; border: 3px solid var(--line); border-radius: 14px; font-weight: 700; font-size: .9em; }
+.picto b { font-size: 1.8em; line-height: 1; }
+.traduction { border-left: 6px solid #0ea5e9; }
+.home-btn.outil { font-size: 1.3em; }
+
+/* ---------- Opération posée ---------- */
+.posee-zone { overflow-x: auto; }
+.posee { --case: min(48px, calc((100vw - 90px) / 7)); display: inline-grid; gap: 0; margin: 0 auto; font-family: 'Andika', Verdana, sans-serif; font-variant-numeric: tabular-nums; }
+.pz { width: var(--case); height: var(--case); display: grid; place-items: center; font-size: calc(var(--case) * .62); font-weight: 700; position: relative; }
+.pz.ret { height: calc(var(--case) * .5); font-size: calc(var(--case) * .38); color: #dc2626; align-items: end; }
+.pz.ret.bas { align-items: start; justify-items: start; padding-left: 2px; }
+.pz.fixe[data-ret]::before { content: attr(data-ret); position: absolute; left: 1px; top: 2px; font-size: .5em; color: #dc2626; }
+.pz.trait { height: 4px; background: #1f2937; border-radius: 2px; }
+.pz.case { border: 3px dashed #94a3b8; border-radius: 10px; background: #fff; margin: 3px 1px; width: calc(var(--case) - 2px); height: calc(var(--case) - 6px); }
+.pz.case.cur { border: 4px solid var(--blue); background: #eff6ff; box-shadow: 0 0 0 4px rgba(37, 99, 235, .2); }
+.pz.case.ok { border: 3px solid var(--green, #16a34a); background: #f0fdf4; color: #166534; }
+.pz.zero { color: #94a3b8; }
+.aide-posee { font-size: 1.05em; }
+
+/* ---------- Aide-mémoire et calculatrice ---------- */
+.pytha { display: grid; grid-template-columns: repeat(11, 1fr); gap: 2px; font-size: .78em; }
+.pc { aspect-ratio: 1; min-width: 0; padding: 0; border: 1px solid #e5e7eb; background: #fff; border-radius: 4px; font-weight: 700; }
+.pc.tete { background: #dbeafe; color: #1e3a8a; }
+.pc.lit { background: #fde68a; }
+.calc-ecran { font-size: 2em; text-align: right; padding: 10px 14px; background: #fff; border: 3px solid var(--line); border-radius: 14px; min-height: 1.6em; }
+.pad.calc { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }

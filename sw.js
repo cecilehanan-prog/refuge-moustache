@@ -2,7 +2,7 @@
    Le nom du cache dépend de l'adresse de l'appli : plusieurs applis d'élèves
    sur le même compte GitHub ne s'effacent pas les unes les autres.
    Après une grosse mise à jour, on peut augmenter VERSION. */
-const VERSION = 'v7';
+const VERSION = 'v8';
 const PREFIX = 'appli-eleve:' + self.registration.scope + ':';
 const CACHE = PREFIX + VERSION;
 const SHELL = ['./', './index.html', './css/style.css', './js/profil.js', './js/univers.js', './js/data.js', './js/core.js', './js/animaux.js', './js/contenu.js', './js/moteurs.js',

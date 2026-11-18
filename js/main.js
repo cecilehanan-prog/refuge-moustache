@@ -12,7 +12,10 @@ Z.appliquerAides = function () {
   const S = Z.state.settings, b = document.body, r = document.documentElement.style;
   b.classList.toggle('ado', Z.ADO);
   b.classList.toggle('lycee', Z.TON === 'lycee');
-  ['dys', 'tdah', 'tsa', 'hpi'].forEach(x => b.classList.toggle('adapt-' + x, Z.adapte(x)));
+  Z.ADAPTATIONS.forEach(([x]) => b.classList.toggle('adapt-' + x, Z.adapte(x)));
+  b.classList.toggle('main-droite', S.main === 'droite');
+  b.classList.toggle('main-gauche', S.main === 'gauche');
+  b.classList.toggle('lignes-couleur', !!S.lignes);
   b.classList.toggle('sans-guides', !Z.GUIDES);
   b.classList.toggle('sans-syllabes', S.syllabes === false);
   b.classList.toggle('serre', S.espacement === false);
@@ -43,6 +46,8 @@ Z.shell = function ({ title }) {
   const top = h('div', { class: 'topbar' },
     h('button', { class: 'home-btn', 'aria-label': 'Accueil', onclick: () => { Z.sfx.tap(); Z.go('home'); } }, '🏠'),
     steps,
+    Z.adapte('dyscalculie') ? h('button', { class: 'home-btn outil', 'aria-label': 'Aide-mémoire', onclick: () => { Z.sfx.tap(); Z.aideMemoire(); } }, '📋') : null,
+    Z.state.settings.calculatrice ? h('button', { class: 'home-btn outil', 'aria-label': 'Calculatrice', onclick: () => { Z.sfx.tap(); Z.calculatrice(); } }, '🧮') : null,
     h('span', { class: 'chip bolt' }, '⚡ ', h('span', { id: 'bolt' }, String(Z.state.eclairs))));
   app.append(top, root);
   return {
@@ -371,10 +376,24 @@ Z.screens.parent = function () {
       h('h3', null, '⚙️ Réglages'),
       h('label', null, 'Pseudo affiché'), name,
       h('label', null, 'Vitesse de la voix'), rate, snd, Z.GUIDES ? cartoon : null,
+      h('h3', null, '🧩 Façons de faire'),
+      h('p', { class: 'small-note' }, 'Cochez ce qui correspond à l’élève (plusieurs possibles). Cela change l’affichage, les devoirs et les exercices.'),
+      ...Z.ADAPTATIONS.map(([id, label]) => {
+        const cb = h('input', { type: 'checkbox', checked: Z.adapte(id), style: { width: '26px', height: '26px' } });
+        cb.addEventListener('change', () => {
+          const L = new Set(Z.adaptActives()); cb.checked ? L.add(id) : L.delete(id);
+          st.settings.adapt = [...L]; if (id === 'malvoyance' && cb.checked && (st.settings.taille || 1) < 1.6) st.settings.taille = 1.6;
+          Z.save(); Z.appliquerAides(); Z.go('parent');
+        });
+        return h('label', { class: 'row', style: { gap: '10px' } }, cb, h('span', null, label));
+      }),
+      reglage('Main valide', 'main', [[null, 'Les deux mains'], ['droite', 'Main droite : boutons à droite'], ['gauche', 'Main gauche : boutons à gauche']]),
+      reglage('Calculatrice', 'calculatrice', [[false, 'Pas de calculatrice'], [true, 'Calculatrice autorisée (PAP)']]),
       h('h3', null, '👓 Aides à la lecture'),
       reglage('Lecture à voix haute', 'autoRead', [[true, 'Les consignes sont lues toutes seules'], [false, 'Seulement quand on touche 🔊']]),
       reglage('Police', 'police', [['andika', 'Andika (lecture facile)'], ['lexend', 'Lexend'], ['arial', 'Arial']]),
-      reglage('Taille du texte', 'taille', [[0.9, 'Petite'], [1, 'Normale'], [1.15, 'Grande'], [1.3, 'Très grande']]),
+      reglage('Taille du texte', 'taille', [[0.9, 'Petite'], [1, 'Normale'], [1.15, 'Grande'], [1.3, 'Très grande'], [1.6, 'Énorme (malvoyance)'], [2, 'Géante']]),
+      reglage('Lignes', 'lignes', [[false, 'Lignes normales'], [true, 'Une ligne sur deux surlignée']]),
       reglage('Espacement', 'espacement', [[true, 'Lettres et lignes espacées'], [false, 'Espacement normal']]),
       reglage('Syllabes', 'syllabes', [[true, 'Syllabes en couleur'], [false, 'Mots d\'une seule couleur']]),
       h('div', { style: { marginTop: '14px' } }, h('button', {
