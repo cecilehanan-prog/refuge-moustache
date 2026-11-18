@@ -111,6 +111,14 @@ var PROFIL = {
     'Pense à ramasser les miettes de pomme, et on continue !', 'Tu mérites une petite mousse, @enfant !'
   ],
 
+  /* --- La fête : Sylvain vient la féliciter (balade à moto, ou bisou avec un cœur) --- */
+  fete: {
+    avec: 'sylvain', homme: true,
+    moto: { modele: 'courseduc', couleur: 'metal', casque: 'chat' },
+    phrasesMoto: ['Allez ma chérie, en selle : on file au Hellfest ! 🤘', 'Bravo ma chérie ! On part en balade à moto pour fêter ça ! 🏍️', 'Je monte derrière toi, ma chérie : direction Clisson ! 🤘'],
+    phrasesBisou: ['Un bisou pour ma chérie ! 😘', 'Je suis fier de toi, ma chérie ! ❤️', 'Ma chérie, tu es la plus forte ! 😘']
+  },
+
   motsEnPlus: [],
 
   couleurs: { principale: '#0d9488', fond: '#f0fdfa' }

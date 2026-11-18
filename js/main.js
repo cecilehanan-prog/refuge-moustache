@@ -74,7 +74,7 @@ Z.fete = function () {
     dessin = h('div', { class: 'fete-moto' }, Z.svg(UNIVERS.moto.dessin({ model: it('model', F.moto.modele), color: it('color', F.moto.couleur), acc: it('acc', F.moto.casque), apparence: F.moto.pilote }), 'fete-svg'), h('span', { class: 'coeur-vole' }, '❤️'));
     t = Z.pick(F.phrasesMoto || ['On part faire un tour pour fêter ça !']);
   } else {
-    const moi = Object.assign({}, PROFIL.enfant.apparence, { coupe: (PROFIL.enfant.apparence || {}).coiffure === 'longs' ? 'longs' : 'courts' });
+    const moi = Object.assign({}, PROFIL.enfant.apparence, { coupe: /longs|queue/.test((PROFIL.enfant.apparence || {}).coiffure || '') ? 'longs' : 'courts' });
     dessin = h('div', { class: 'fete-bisou' }, Z.svg(Z.art.animal({ espece: 'humain', couleurs: moi }), 'buste moi'),
       h('span', { class: 'coeur' }, '❤️'), Z.svg(Z.art.animal({ espece: 'humain', couleurs: g.couleurs }), 'buste elle'));
     t = Z.pick(F.phrasesBisou || ['Un bisou pour toi !']);

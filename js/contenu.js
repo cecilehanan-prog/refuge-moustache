@@ -89,6 +89,12 @@ window.ZCONTENU = {
 
   /* ===================== HISTOIRE-GÉO ===================== */
   histoire: [
+    { id: 'metal', type: 'qcm', titre: 'Un peu d\'histoire du métal', notion: 'Culture',
+      questions: [
+        { q: 'Dans quelle ville a lieu le Hellfest ?', choix: ['Clisson, en Loire-Atlantique', 'Lyon', 'Lille'], explication: 'Le Hellfest se tient à Clisson, près de Nantes.' },
+        { q: 'Dans quelle ville le groupe Black Sabbath est-il né, en 1968 ?', choix: ['Birmingham, en Angleterre', 'Los Angeles, aux États-Unis', 'Oslo, en Norvège'], explication: 'Black Sabbath, pionnier du heavy metal, vient de Birmingham.' },
+        { q: 'Dans quelle ville le groupe Metallica a-t-il été fondé, en 1981 ?', choix: ['Los Angeles', 'Londres', 'Berlin'], explication: 'Metallica a été fondé à Los Angeles en 1981.' }
+      ] },
     { id: 'frise', type: 'ordre', titre: 'Les grandes périodes', notion: 'Repères chronologiques',
       consigne: 'Range ces événements du plus ancien au plus récent.',
       series: [

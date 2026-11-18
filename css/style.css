@@ -572,7 +572,7 @@ body.adapt-tdah .screen .guide-says { grid-template-columns: 1fr; }
 /* ---------- La fête (moto, bisou) ---------- */
 .fete { gap: 8px; overflow: hidden; }
 .fete-moto { position: relative; width: 100%; animation: roule 3.2s ease-in-out 1; }
-.fete-moto .fete-svg { display: flex; justify-content: center; }
+.fete-moto .fete-svg { width: 100%; text-align: center; }
 .fete-moto .fete-svg svg { width: 100%; max-width: 280px; }
 @keyframes roule { 0% { transform: translateX(-60%); } 60% { transform: translateX(4%); } 100% { transform: translateX(0); } }
 .fete-bisou { display: flex; align-items: center; justify-content: center; gap: 0; }
