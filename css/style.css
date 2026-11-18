@@ -568,3 +568,20 @@ body.adapt-tdah .screen .guide-says { grid-template-columns: 1fr; }
 .pc.lit { background: #fde68a; }
 .calc-ecran { font-size: 2em; text-align: right; padding: 10px 14px; background: #fff; border: 3px solid var(--line); border-radius: 14px; min-height: 1.6em; }
 .pad.calc { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+
+/* ---------- La fête (moto, bisou) ---------- */
+.fete { gap: 8px; overflow: hidden; }
+.fete-moto { position: relative; width: 100%; animation: roule 3.2s ease-in-out 1; }
+.fete-moto .fete-svg { display: flex; justify-content: center; }
+.fete-moto .fete-svg svg { width: 100%; max-width: 280px; }
+@keyframes roule { 0% { transform: translateX(-60%); } 60% { transform: translateX(4%); } 100% { transform: translateX(0); } }
+.fete-bisou { display: flex; align-items: center; justify-content: center; gap: 0; }
+.fete-bisou .buste { width: 118px; margin: 0 -14px; }
+.fete-bisou .coeur { position: relative; z-index: 1; margin-top: -40px; }
+.fete-bisou .buste.moi { transform: scaleX(-1) rotate(-6deg); animation: approche-g 1.6s ease-out 1; }
+.fete-bisou .buste.elle { transform: rotate(-6deg); animation: approche-d 1.6s ease-out 1; }
+@keyframes approche-g { from { transform: scaleX(-1) translateX(30px); } }
+@keyframes approche-d { from { transform: translateX(30px) rotate(-6deg); } }
+.coeur, .coeur-vole { font-size: 2.4em; animation: battement .9s ease-in-out infinite; }
+.coeur-vole { position: absolute; right: 18%; top: 4%; }
+@keyframes battement { 50% { transform: scale(1.3); } }

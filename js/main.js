@@ -61,6 +61,29 @@ Z.shell = function ({ title }) {
   };
 };
 
+/* La fête (profil.js → fete) : la personne aimée vient féliciter l'élève,
+   soit en l'emmenant faire un tour de moto, soit avec un bisou et un cœur. */
+Z.fete = function () {
+  const F = PROFIL.fete, g = F && PROFIL.animaux.find(a => a.id === F.avec);
+  if (!g) return null;
+  const voix = { pitch: (g.voix && g.voix.hauteur) || 1, male: !!F.homme };
+  const moto = F.moto && UNIVERS.moto && Math.random() < 0.5;
+  let dessin, t;
+  if (moto) {
+    const it = (oid, id) => { const o = UNIVERS.moto.onglets.find(x => x.id === oid); return o.items.find(x => x.id === id) || o.items[0]; };
+    dessin = h('div', { class: 'fete-moto' }, Z.svg(UNIVERS.moto.dessin({ model: it('model', F.moto.modele), color: it('color', F.moto.couleur), acc: it('acc', F.moto.casque), apparence: F.moto.pilote }), 'fete-svg'), h('span', { class: 'coeur-vole' }, '❤️'));
+    t = Z.pick(F.phrasesMoto || ['On part faire un tour pour fêter ça !']);
+  } else {
+    const moi = Object.assign({}, PROFIL.enfant.apparence, { coupe: (PROFIL.enfant.apparence || {}).coiffure === 'longs' ? 'longs' : 'courts' });
+    dessin = h('div', { class: 'fete-bisou' }, Z.svg(Z.art.animal({ espece: 'humain', couleurs: moi }), 'buste moi'),
+      h('span', { class: 'coeur' }, '❤️'), Z.svg(Z.art.animal({ espece: 'humain', couleurs: g.couleurs }), 'buste elle'));
+    t = Z.pick(F.phrasesBisou || ['Un bisou pour toi !']);
+  }
+  const txt = g.nom + ' : ' + t;
+  setTimeout(() => Z.speak(t, voix), 3200);
+  return h('div', { class: 'card fete col center' }, dessin, h('div', { class: 'bubble' }, h('span', null, txt), Z.ear(t, voix)));
+};
+
 /* Écran de fin de jeu, commun aux 3 jeux */
 Z.endScreen = function (shell, { medal, title, eclairs, xp, lines = [], kind, again, detail, againLabel = '🔁 Encore !' }) {
   const leveled = Z.finishGame(kind, eclairs, xp, detail);
@@ -77,6 +100,7 @@ Z.endScreen = function (shell, { medal, title, eclairs, xp, lines = [], kind, ag
       ...lines.map(l => h('div', null, l))),
     (() => {
       const cheer = Z.pick(ZDATA.cheers);
+      if (PROFIL.fete && (medal === '🥇' || Math.random() < 0.4)) { const el = Z.fete(); if (el) return el; }
       if (ZDATA.family.length) {
         const f = Z.pick(ZDATA.family); const t = f.name.charAt(0).toUpperCase() + f.name.slice(1) + ' : ' + (f.cheers && f.cheers.length ? Z.pick(f.cheers) : cheer);
         setTimeout(() => Z.speak(t, Z.familyVoice(f)), 3200); return Z.familySays(f, t, { speak: false });

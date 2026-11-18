@@ -66,7 +66,9 @@ const KEY = 'appli-eleve-' + (PROFIL.id || 'eleve') + '-v1';
 Z.KEY = KEY;
 function defaultState() {
   const owned = {}, equip = {};
-  ZDATA.univers.onglets.forEach(o => { owned[o.id] = [o.items[0].id]; equip[o.id] = o.items[0].id; });
+  /* profil.js → depart : { model: 'electrique' } = un objet déjà offert et choisi au départ */
+  const dep = PROFIL.depart || {};
+  ZDATA.univers.onglets.forEach(o => { const d = o.items.find(x => x.id === dep[o.id]); owned[o.id] = [o.items[0].id].concat(d && d !== o.items[0] ? [d.id] : []); equip[o.id] = (d || o.items[0]).id; });
   PROFIL.animaux.forEach(a => { owned['animal_' + a.id] = ['aucun']; equip['animal_' + a.id] = 'aucun'; });
   return {
     name: PROFIL.enfant.pseudo, eclairs: 25, xp: 0,

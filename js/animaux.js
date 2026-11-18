@@ -8,7 +8,7 @@
      oreilles = intérieur ou oreilles     taches = rayures / taches
      yeux     = couleur des yeux          collier = couleur du collier
      (tortue : carapace, bord · oiseau : ailes, bec ·
-     humain : peau, cheveux, coupe 'courts'|'longs', yeux, tshirt, motif, barbe, bouc)
+     humain : peau, cheveux, coupe 'courts'|'longs', yeux, tshirt, motif, barbe, bouc, lunettes)
    La tête est toujours centrée en (60, 52) : les accessoires
    (casquette, lunettes, nœud…) vont donc sur tous les animaux.
    ========================================================= */
@@ -135,6 +135,7 @@
         ${yeuxH}
         <path d="M60 56 q-3 7 1 8" stroke="#c08a6a" stroke-width="2" fill="none" stroke-linecap="round"/>
         ${barbe}${bouc}
+        ${k.lunettes ? `<circle cx="50" cy="54" r="8" fill="rgba(255,255,255,.25)" stroke="${k.lunettes}" stroke-width="2.5"/><circle cx="70" cy="54" r="8" fill="rgba(255,255,255,.25)" stroke="${k.lunettes}" stroke-width="2.5"/><path d="M58 54 h4 M42 53 l-5 -1 M78 53 l5 -1" stroke="${k.lunettes}" stroke-width="2.5"/>` : ''}
         <path d="M52 68 q8 6 16 0" stroke="#9a3b2b" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
     },
     oiseau(k, mood) {

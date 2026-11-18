@@ -63,6 +63,7 @@ function dessinEnfant(o) {
     <ellipse cx="${cx - 6}" cy="${hy + 1}" rx="2.6" ry="3.2" fill="${eyes}"/><ellipse cx="${cx + 6}" cy="${hy + 1}" rx="2.6" ry="3.2" fill="${eyes}"/>
     <circle cx="${cx - 5}" cy="${hy}" r="1" fill="#fff"/><circle cx="${cx + 7}" cy="${hy}" r="1" fill="#fff"/>
     <path d="M${cx - 6} ${hy + 8} q6 5 12 0" stroke="#9a3b2b" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    ${A.bouc ? `<path d="M${cx - 6} ${hy + 6} Q${cx} ${hy + 3.5} ${cx + 6} ${hy + 6}" stroke="${A.bouc}" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M${cx - 4.5} ${hy + 13} Q${cx} ${hy + 12} ${cx + 4.5} ${hy + 13} Q${cx + 3.5} ${hy + 19} ${cx} ${hy + 21} Q${cx - 3.5} ${hy + 19} ${cx - 4.5} ${hy + 13} Z" fill="${A.bouc}"/>` : ''}
     <circle cx="${cx - 11}" cy="${hy + 6}" r="2.6" fill="#f4a7a0" opacity=".5"/><circle cx="${cx + 11}" cy="${hy + 6}" r="2.6" fill="#f4a7a0" opacity=".5"/>`;
   return `${o.cape ? `<path d="M${cx - 16} ${t + 40} L${cx - 30} ${t + 120} L${cx + 30} ${t + 120} L${cx + 16} ${t + 40} Z" fill="${o.cape}"/>` : ''}
     ${hairBack}${body}${arms}${face}${hairTop}${o.head || ''}`;
@@ -482,7 +483,7 @@ UNIVERS.moto = {
     /* Pilote */
     const penche = course ? 1 : 0;
     const hx = course ? 124 : 112, hy = course ? yH - 40 : yH - 56;
-    const AP = (PROFIL.enfant && PROFIL.enfant.apparence) || {};
+    const AP = o.apparence || (PROFIL.enfant && PROFIL.enfant.apparence) || {};
     /* Longue queue de cheval qui flotte au vent derrière le casque */
     const HC = AP.cheveux || '#4a2c17';
     const queue = /queue|longs/.test(AP.coiffure || '') ? `<path d="M${hx - 13} ${hy - 2} Q${hx - 34} ${hy - 4} ${hx - 50} ${hy + 14} Q${hx - 58} ${hy + 24} ${hx - 64} ${hy + 22} Q${hx - 50} ${hy + 30} ${hx - 36} ${hy + 16} Q${hx - 26} ${hy + 8} ${hx - 12} ${hy + 8} Z" fill="${HC}"/>
