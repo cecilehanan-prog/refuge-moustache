@@ -49,7 +49,7 @@ window.ZCONTENU = {
     { id: 'homophones', type: 'trous', titre: 'Les homophones', notion: 'Orthographe',
       rappel: 'a / à : remplace par « avait ». Si ça marche, c\'est « a ». ou / où : « où » indique le lieu ou le moment. ces / ses : « ses » = les siens, « ces » = ceux-là.',
       phrases: [
-        { t: 'Moustache {a|à} dormi toute la journée {à|a} côté du radiateur.', aide: 'Essaie de remplacer par « avait ».' },
+        { t: 'Fouffy {a|à} dormi toute la journée {à|a} côté du radiateur.', aide: 'Essaie de remplacer par « avait ».' },
         { t: 'Tu préfères le trail {ou|où} la course sur route ?', aide: 'On peut dire « ou bien » : pas d\'accent.' },
         { t: 'Le refuge {où|ou} nous dormons est en haut de la montée.', aide: 'Ici, on parle d\'un lieu.' },
         { t: 'Adeline a laissé {ses|ces|c\'est} miettes de pomme partout !', aide: 'Les miettes à qui ? Les siennes.' },

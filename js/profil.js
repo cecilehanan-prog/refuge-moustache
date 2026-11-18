@@ -70,8 +70,8 @@ var PROFIL = {
   },
 
   appli: {
-    nom: 'Le Refuge de Moustache',
-    nomCourt: 'Refuge Moustache',
+    nom: 'Le Refuge de Fouffy',
+    nomCourt: 'Refuge Fouffy',
     jeux: { mots: '', tables: '', problemes: 'Les Enquêtes du trail', parcours: '', devoirs: 'Mes devoirs' },
     adulte: 'l\'adulte',
     ecole: 'le professeur'
@@ -82,11 +82,11 @@ var PROFIL = {
   passions: ['moto', 'trail'], // le trail reste dans les problèmes et les calculs
 
   /* --- Les animaux guides ---
-     Moustache = son chat : un grand et vieux chat noir et blanc.
+     Fouffy = son chat : un grand et vieux chat noir et blanc.
      Sylvain = son chéri (grand, cheveux bruns, petit bouc, t-shirt noir sobre) : il présente les devoirs.
      */
   animaux: [
-    { id: 'moustache', nom: 'Moustache', espece: 'chat', roles: ['accueil', 'francais', 'mots'],
+    { id: 'moustache', nom: 'Fouffy', espece: 'chat', roles: ['accueil', 'francais', 'mots'],
       couleurs: { pelage: '#1c1c1f', clair: '#f8fafc', taches: '#1c1c1f', oreilles: '#f2b3b3', yeux: '#a3c43b', nez: '#e79a9a', collier: '#0d9488' },
       voix: { hauteur: 1.0, vitesse: 0.88 } },
     { id: 'pirouette', nom: 'Pirouette', espece: 'oiseau', roles: ['maths', 'problemes', 'tables'],
