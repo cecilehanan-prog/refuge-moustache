@@ -113,7 +113,8 @@ Z.endScreen = function (shell, { medal, title, eclairs, xp, lines = [], kind, ag
   if (leveled) setTimeout(() => {
     Z.sfx.win(); Z.confetti(200);
     const nouveau = Z.onglet('model').items.find(m => m.lvl === Z.levelInfo().lvl && m.lvl > 1);
-    const t = `Niveau ${Z.levelInfo().lvl} ! Tu montes de niveau, bravo ! ${Z.jauge().phrase}${nouveau ? ` Nouveau dans la boutique : ${nouveau.name} !` : ''}`;
+    const acts = Z.activitesDuNiveau ? Z.activitesDuNiveau(Z.levelInfo().lvl) : [];
+    const t = `Niveau ${Z.levelInfo().lvl} ! Tu montes de niveau, bravo ! ${Z.jauge().phrase}${nouveau ? ` Nouveau dans la boutique : ${nouveau.name} !` : ''}${acts.length ? ` Nouvelle activité : ${acts.join(', ')} !` : ''}`;
     Z.speak(t);
     Z.modal(h('div', { class: 'col center' }, h('div', { class: 'big-reward' }, '⭐'), h('h2', null, t),
       h('button', { class: 'btn gold wide', onclick: (e) => e.target.closest('.modal').remove() }, 'Trop bien !')));
@@ -179,7 +180,10 @@ Z.screens.home = function () {
 
   const nav = navBar('home');
 
-  app.append(top, hello, scene, mission, motJour || "", worlds, nav);
+  const D = Z.defiDuJour && Z.defiDuJour();
+  const defi = D ? h('button', { class: 'card defi defi-btn', onclick: () => { Z.sfx.vroum(); Z.go('activite', D.r.id, D.a.id, { defi: true }); } },
+    h('b', null, '🎯 Défi du jour'), h('span', null, `${D.a.titre || D.r.titre} · palier ${D.p + 1} · éclairs ×2`)) : null;
+  app.append(top, hello, scene, mission, defi || "", motJour || "", worlds, nav);
 
   if (!st.welcomed) {
     st.welcomed = true; Z.save();

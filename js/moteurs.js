@@ -45,6 +45,63 @@
   const JEUX = { mots: 'mots', tables: 'tables', problemes: 'problemes', route: 'route', parcours: 'route' };
   const titreAct = (a) => a.titre || (a.type === 'jeu' ? Z.titre(a.jeu === 'route' ? 'parcours' : a.jeu) : 'Activité');
 
+  /* ---------- Paliers de difficulté et activités à débloquer ----------
+     • paliers : [ {données du palier 1}, {palier 2}, {palier 3} ] (facile, moyen, expert).
+       Le palier suivant s'ouvre à 80 % de réussite du premier coup ;
+       deux essais sous 50 % → on revient au palier d'avant, sans en faire un échec.
+     • posee + generer: ['+', '-', '×'] : les opérations sont tirées au hasard,
+       de plus en plus grandes à chaque palier.
+     • niveauMin : l'activité se débloque à ce niveau. */
+  const PAL = () => (Z.state.paliers = Z.state.paliers || {});
+  const NOMS_P = ['facile', 'moyen', 'expert'];
+  const nomPalier = (p, n) => n === 3 ? NOMS_P[p] : `palier ${p + 1}`;
+  const nbPaliers = (a) => a.paliers ? a.paliers.length : (a.type === 'posee' && a.generer ? 3 : 1);
+  Z.palierDe = (rid, a) => Math.min(nbPaliers(a) - 1, (PAL()[actKey(rid, a)] || {}).p || 0);
+  const verrou = (a) => !!a.niveauMin && Z.levelInfo().lvl < a.niveauMin;
+  function genererPosee(ops, p) {
+    const r = (lo, hi) => lo + Math.floor(Math.random() * (hi - lo + 1));
+    return [0, 1, 2, 3].map(i => {
+      const op = ops[i % ops.length];
+      if (op === '+') return p === 0 ? { a: r(12, 49), b: r(11, 39), op } : p === 1 ? { a: r(128, 899), b: r(105, 799), op } : { a: r(1250, 9899), b: r(1050, 8999), op };
+      if (op === '-' || op === '−') { const a = p === 0 ? r(35, 99) : p === 1 ? r(300, 999) : r(2000, 9999); return { a, b: r(Math.floor(a / 5), a - 1), op: '-' }; }
+      return p === 0 ? { a: r(12, 49), b: r(2, 5), op: '×' } : p === 1 ? { a: r(102, 499), b: r(6, 9), op: '×' } : { a: r(120, 999), b: r(12, 48), op: '×' };
+    });
+  }
+  function avecPalier(a, p) {
+    const x = a.paliers ? Object.assign({}, a, a.paliers[p]) : Object.assign({}, a);
+    if (a.type === 'posee' && a.generer && !a.paliers) x.operations = genererPosee(a.generer, p);
+    x.palier = p;
+    return x;
+  }
+  function palierApres(rid, a, ok, total) {
+    const n = nbPaliers(a);
+    if (n <= 1 || !total) return null;
+    const k = actKey(rid, a), s = PAL()[k] = PAL()[k] || { p: 0, bas: 0 };
+    const taux = ok / total, joue = a.palier !== undefined ? a.palier : s.p;
+    if (a.defi) {
+      Z.state.defiFait = Z.today();
+      if (taux >= 0.8 && joue > s.p) { s.p = joue; s.bas = 0; return `🎯 Défi réussi : le palier ${joue + 1} (${nomPalier(joue, n)}) est débloqué !`; }
+      return '🎯 Bel essai ! Ce défi reviendra.';
+    }
+    if (joue !== s.p) return null;
+    if (taux >= 0.8 && s.p < n - 1) { s.p++; s.bas = 0; return `🔓 Palier ${s.p + 1} débloqué : ${nomPalier(s.p, n)} !`; }
+    if (taux < 0.5) { s.bas++; if (s.bas >= 2 && s.p > 0) { s.p--; s.bas = 0; return 'On consolide le palier d’avant, puis on remonte.'; } }
+    else s.bas = 0;
+    return null;
+  }
+  /* Le défi du jour : une activité, un palier au-dessus, éclairs doublés */
+  Z.defiDuJour = function () {
+    if (Z.state.defiFait === Z.today()) return null;
+    const L = [];
+    Z.rubriques().forEach(r => r.activites.forEach(a => {
+      const n = nbPaliers(a);
+      if (n > 1 && !verrou(a) && Z.palierDe(r.id, a) < n - 1) L.push({ r, a, p: Z.palierDe(r.id, a) + 1, n });
+    }));
+    return L.length ? L[Z.dayNum() % L.length] : null;
+  };
+  /* Les activités qui se débloquent à un niveau donné */
+  Z.activitesDuNiveau = (lvl) => Z.rubriques().flatMap(r => r.activites.filter(a => a.niveauMin === lvl).map(a => titreAct(a)));
+
   /* ---------- Écran d'une rubrique : la liste des activités ---------- */
   Z.screens.rubrique = function (rid) {
     const r = Z.rubrique(rid);
@@ -53,31 +110,48 @@
     const t = r.activites.length ? `${r.titre}. Choisis une activité !` : `${r.titre}. Il n'y a pas encore d'activité ici.`;
     shell.root.append(h('h2', null, r.icone + ' ' + r.titre), Z.guideSays(t),
       ...r.activites.map(a => {
-        const rr = rec(rid, a);
+        const rr = rec(rid, a), n = nbPaliers(a), p = Z.palierDe(rid, a);
+        if (verrou(a)) return h('button', { class: 'devoir verrou', onclick: () => { Z.sfx.tap(); Z.pop(`Se débloque au niveau ${a.niveauMin} 🔒`, 'soft'); } },
+          h('span', { class: 'd-ico' }, '🔒'), h('span', { class: 'grow' }, titreAct(a), h('small', null, `Se débloque au niveau ${a.niveauMin}`)), h('span', { class: 'd-go' }, ''));
+        const etoiles = n > 1 ? ' · ' + '★'.repeat(p + 1) + '☆'.repeat(n - p - 1) : '';
         return h('button', { class: 'devoir' + (rr ? ' fait' : ''), onclick: () => { Z.sfx.vroum(); Z.go('activite', rid, a.id); } },
           h('span', { class: 'd-ico' }, rr ? '✅' : (a.icone || ICO[a.type] || '⭐')),
-          h('span', { class: 'grow' }, titreAct(a), h('small', null, (a.notion || '') + (rr ? `${a.notion ? ' · ' : ''}fait ${rr.n} fois` : ''))),
+          h('span', { class: 'grow' }, titreAct(a), h('small', null, (a.notion || '') + (rr ? `${a.notion ? ' · ' : ''}fait ${rr.n} fois` : '') + etoiles)),
           h('span', { class: 'd-go' }, '▶'));
       }));
   };
 
   /* ---------- Lancer une activité ---------- */
-  Z.screens.activite = function (rid, aid) {
-    const a = actOf(rid, aid);
-    if (!a) return Z.go('rubrique', rid);
+  Z.screens.activite = function (rid, aid, opts = {}) {
+    const a0 = actOf(rid, aid);
+    if (!a0) return Z.go('rubrique', rid);
+    if (verrou(a0)) { Z.pop(`Se débloque au niveau ${a0.niveauMin} 🔒`, 'soft'); return Z.go('rubrique', rid); }
+    const n = nbPaliers(a0), pMax = Z.palierDe(rid, a0);
+    let a = avecPalier(a0, opts.defi ? Math.min(n - 1, pMax + 1) : pMax);
+    if (opts.defi) a.defi = true;
     /* Jeux intégrés : la fin du jeu sera comptée pour cette activité */
     if (a.type === 'jeu') { Z.go(JEUX[a.jeu] || 'home'); Z.actEnCours = actKey(rid, a); return; }
     if (a.type === 'orthographe') { Z.go('mots', { rid, aid }); Z.actEnCours = actKey(rid, a); return; }
     const M = MOTEURS[a.type];
     if (!M) { Z.go('rubrique', rid); Z.pop('Type inconnu : ' + a.type, 'soft'); return; }
     const shell = Z.shell({ title: titreAct(a) });
-    const ctx = makeCtx(shell, rid, a);
-    /* Intro : titre + consigne lue, puis on commence */
+    /* Intro : titre + consigne lue, (palier), puis on commence */
     shell.setSteps(0, 0);
     const t = a.consigne || DEF_CONSIGNE[a.type] || 'C\'est parti !';
-    shell.root.append(h('h2', null, (a.icone || ICO[a.type]) + ' ' + titreAct(a)), Z.guideSays(t), ...Z.consigneBloc(Object.assign({}, a, { consigne: t })),
+    let choixP = null;
+    if (n > 1 && !a.defi) {
+      choixP = h('div', { class: 'paliers' }, h('b', null, 'Palier : '), ...Array.from({ length: n }, (_, k) => h('button', {
+        class: 'chip-p' + (k === a.palier ? ' on' : '') + (k > pMax ? ' ferme' : ''),
+        onclick: (e) => {
+          if (k > pMax) { Z.pop('Réussis le palier d’avant pour l’ouvrir 🔒', 'soft'); return; }
+          Z.sfx.tap(); a = avecPalier(a0, k); choixP.querySelectorAll('.chip-p').forEach((b, j) => b.classList.toggle('on', j === k));
+        } }, (k > pMax ? '🔒 ' : '') + nomPalier(k, n))));
+    }
+    shell.root.append(h('h2', null, (a.icone || ICO[a.type]) + ' ' + titreAct(a)),
+      a.defi ? h('div', { class: 'card defi' }, h('b', null, `🎯 Défi du jour : palier ${a.palier + 1} (${nomPalier(a.palier, n)}), éclairs doublés !`)) : null,
+      Z.guideSays(t), ...Z.consigneBloc(Object.assign({}, a, { consigne: t })), choixP,
       a.rappel ? h('div', { class: 'card rule' }, h('b', null, '📌 À retenir : '), a.rappel, Z.ear(a.rappel)) : null,
-      h('button', { class: 'btn green wide', onclick: () => { Z.sfx.tap(); M(ctx, a); } }, '▶️ C\'est parti !'));
+      h('button', { class: 'btn green wide', onclick: () => { Z.sfx.tap(); M(makeCtx(shell, rid, a), a); } }, '▶️ C\'est parti !'));
   };
   /* Les devoirs utilisent les mêmes moteurs (qcm, trous, paires…) */
   Z.lancerMoteur = function (shell, a, fin) {
@@ -116,11 +190,12 @@
         r[k] = r[k] || { n: 0, best: 0 };
         r[k].n++; r[k].best = Math.max(r[k].best, firstTry);
         const parfait = total && firstTry === total;
+        const msgP = palierApres(rid, a, firstTry, total);
         Z.endScreen(shell, {
           medal: parfait ? '🥇' : firstTry >= total / 2 ? '🥈' : '🥉', kind: 'act', detail: k,
-          eclairs: 6 + firstTry * 2, xp: 10 + firstTry * 3,
+          eclairs: (6 + firstTry * 2) * (a.defi ? 2 : 1), xp: (10 + firstTry * 3) * (a.defi ? 2 : 1),
           title: parfait ? 'Parfait, tout du premier coup !' : 'Activité terminée !',
-          lines: [total ? `${firstTry} réussite(s) du premier coup sur ${total}` : '', ...lines].filter(Boolean),
+          lines: [total ? `${firstTry} réussite(s) du premier coup sur ${total}` : '', msgP, ...lines].filter(Boolean),
           again: () => Z.go('activite', rid, a.id), againLabel: '🔁 Recommencer'
         });
         shell.root.append(h('button', { class: 'btn ghost wide', onclick: () => { Z.sfx.tap(); Z.go('rubrique', rid); } }, '⬅️ ' + Z.rubrique(rid).titre));
